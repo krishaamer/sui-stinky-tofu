@@ -191,47 +191,53 @@ function App() {
   }, [jwtString, userSalt]);
 
   useEffect(() => {
-    const fetchZKProof = async () => {
-      try {
-        setFetchingZKProof(true);
-        const zkProofResult = await axios.post(
-          SUI_PROVER_DEV_ENDPOINT,
-          {
-            jwt: idToken as string,
-            extendedEphemeralPublicKey: extendedEphemeralPublicKey,
-            maxEpoch: maxEpoch,
-            jwtRandomness: randomness,
-            salt: userSalt,
-            keyClaimName: "sub",
-          },
-          {
-            headers: {
-              "Content-Type": "application/json",
-            },
-          }
-        );
-        setZkProof(zkProofResult.data as PartialZkLoginSignature);
-        enqueueSnackbar("Successfully obtain ZK Proof", {
-          variant: "success",
-        });
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      } catch (error: any) {
-        console.error(error);
-        enqueueSnackbar(String(error?.response?.data?.message || error), {
-          variant: "error",
-        });
-      } finally {
-        setFetchingZKProof(false);
-      }
-    };
 
-    fetchZKProof();
+    if (userSalt && jwtString) {
+      const fetchZKProof = async () => {
+        try {
+          setFetchingZKProof(true);
+          const zkProofResult = await axios.post(
+            SUI_PROVER_DEV_ENDPOINT,
+            {
+              jwt: idToken as string,
+              extendedEphemeralPublicKey: extendedEphemeralPublicKey,
+              maxEpoch: maxEpoch,
+              jwtRandomness: randomness,
+              salt: userSalt,
+              keyClaimName: "sub",
+            },
+            {
+              headers: {
+                "Content-Type": "application/json",
+              },
+            }
+          );
+          setZkProof(zkProofResult.data as PartialZkLoginSignature);
+          enqueueSnackbar("Successfully obtain ZK Proof", {
+            variant: "success",
+          });
+          // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        } catch (error: any) {
+          console.error(error);
+          enqueueSnackbar(String(error?.response?.data?.message || error), {
+            variant: "error",
+          });
+        } finally {
+          setFetchingZKProof(false);
+        }
+      };
+
+      fetchZKProof();
+    }
+
   }, [
     idToken,
     extendedEphemeralPublicKey,
     maxEpoch,
     randomness,
     userSalt,
+    jwtString,
+    decodedJwt,
     ephemeralKeyPair,
   ]);
 
