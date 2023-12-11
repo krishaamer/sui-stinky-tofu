@@ -17,12 +17,12 @@
     "@mui/material": "^5.14.18",
     "@mysten/dapp-kit": "^0.9.0",
     "@mysten/sui.js": "^0.46.1",
-    "@mysten/zklogin": "^0.3.4",
+    "@mysten/zklogin": "^0.0.0-experimental-20231206190551",
     "@noble/curves": "^1.2.0",
     "@tanstack/react-query": "^5.8.4",
     "@types/react-syntax-highlighter": "^15.5.10",
     "@vercel/analytics": "^1.1.1",
-    "axios": "^1.6.1",
+    "axios": "^1.6.2",
     "bignumber.js": "^9.1.2",
     "buffer": "^6.0.3",
     "i18next": "^23.7.6",
@@ -38,7 +38,7 @@
   },
   "devDependencies": {
     "@types/node": "^20.9.0",
-    "@types/react": "^18.2.15",
+    "@types/react": "^18.2.37",
     "@types/react-dom": "^18.2.7",
     "@typescript-eslint/eslint-plugin": "^6.0.0",
     "@typescript-eslint/parser": "^6.0.0",
@@ -49,6 +49,6 @@
     "eslint-plugin-react-refresh": "^0.4.3",
     "tailwindcss": "^3.3.5",
     "typescript": "^5.0.2",
-    "vite": "^4.4.5"
+    "vite": "^4.5.1"
   }
 }

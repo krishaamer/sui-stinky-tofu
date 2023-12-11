@@ -4,11 +4,6 @@ import {
   Box,
   Button,
   ButtonGroup,
-  Dialog,
-  DialogActions,
-  DialogContent,
-  DialogContentText,
-  DialogTitle,
   Stack,
   Step,
   StepLabel,
@@ -41,14 +36,14 @@ import { useLocation, useNavigate } from "react-router-dom";
 import { Prism as SyntaxHighlighter } from "react-syntax-highlighter";
 import { oneDark } from "react-syntax-highlighter/dist/esm/styles/prism";
 import "./App.css";
-import GoogleLogo from "./assets/google.svg";
+import KakaoLogo from "./assets/kakao.png";
 import {
   AXIOS_ZKPROOF,
   BUILD_ZKLOGIN_SIGNATURE,
   GENERATE_NONCE,
 } from "./code_example";
 import {
-  CLIENT_ID,
+  REST_API_KEY,
   FULLNODE_URL,
   KEY_PAIR_SESSION_STORAGE_KEY,
   MAX_EPOCH_LOCAL_STORAGE_KEY,
@@ -70,11 +65,11 @@ const suiClient = new SuiClient({ url: FULLNODE_URL });
 
 function App() {
   const { t, i18n } = useTranslation();
-  const [showResetDialog, setShowResetDialog] = useState(false);
   const [currentEpoch, setCurrentEpoch] = useState("");
   const [nonce, setNonce] = useState("");
   const [oauthParams, setOauthParams] =
     useState<queryString.ParsedQuery<string>>();
+  const [idToken, setIdToken] = useState("");
   const [zkLoginUserAddress, setZkLoginUserAddress] = useState("");
   const [decodedJwt, setDecodedJwt] = useState<JwtPayload>();
   const [jwtString, setJwtString] = useState("");
@@ -106,13 +101,21 @@ function App() {
 
   // query jwt id_token
   useEffect(() => {
-    if (oauthParams && oauthParams.id_token) {
-      const decodedJwt = jwtDecode(oauthParams.id_token as string);
-      setJwtString(oauthParams.id_token as string);
+    if (oauthParams && idToken) {
+      const decodedJwt = jwtDecode(idToken);
+      setJwtString(idToken as string);
       setDecodedJwt(decodedJwt);
       setActiveStep(2);
     }
   }, [oauthParams]);
+
+  useEffect(() => {
+    // Check for the presence of the authorization code
+    const queryParams = queryString.parse(location.search);
+    if (queryParams.code) {
+      exchangeCodeForToken(queryParams.code);
+    }
+  }, [location]);
 
   useEffect(() => {
     const privateKey = window.sessionStorage.getItem(
@@ -208,7 +211,6 @@ function App() {
       window.sessionStorage.clear();
       window.localStorage.clear();
       resetState();
-      setShowResetDialog(false);
       navigate(`/`);
       setActiveStep(0);
       enqueueSnackbar("Reset successful", {
@@ -218,6 +220,32 @@ function App() {
       enqueueSnackbar(String(error), {
         variant: "error",
       });
+    }
+  };
+
+  const exchangeCodeForToken = async (code) => {
+    try {
+      const response = await axios.post(
+        "https://kauth.kakao.com/oauth/token",
+        {
+          grant_type: "authorization_code",
+          client_id: REST_API_KEY,
+          redirect_uri: REDIRECT_URI,
+          code: code,
+        },
+        {
+          headers: {
+            "Content-Type": "application/x-www-form-urlencoded",
+          },
+        }
+      );
+
+      setIdToken(response.data.id_token);
+
+      // Process the id_token as needed
+    } catch (error) {
+      console.error("Error exchanging code for token", error);
+      // Handle errors
     }
   };
 
@@ -246,6 +274,15 @@ function App() {
     }
   };
 
+  const doCryptoStuff = () => {
+    const ephemeralKeyPair = Ed25519Keypair.generate();
+    window.sessionStorage.setItem(
+      KEY_PAIR_SESSION_STORAGE_KEY,
+      ephemeralKeyPair.export().privateKey
+    );
+    setEphemeralKeyPair(ephemeralKeyPair);
+  };
+
   return (
     <Box>
       <Box
@@ -267,7 +304,7 @@ function App() {
               columnGap: "16px",
             }}
           >
-            Sui zkLogin Demo{" "}
+            SUI ZIRAN{" "}
             <ButtonGroup
               variant="outlined"
               aria-label="Disabled elevation buttons"
@@ -309,79 +346,13 @@ function App() {
             color="error"
             size="small"
             onClick={() => {
-              setShowResetDialog(true);
+              resetLocalState();
             }}
           >
             Reset LocalState
           </Button>
-          <Dialog
-            open={showResetDialog}
-            onClose={() => {
-              setShowResetDialog(false);
-            }}
-          >
-            <DialogTitle>
-              Please confirm if you want to reset the local state?
-            </DialogTitle>
-            <DialogContent>
-              <DialogContentText>
-                Resetting the local state{" "}
-                <span
-                  style={{
-                    fontWeight: 600,
-                  }}
-                >
-                  will clear the Salt value
-                </span>{" "}
-                stored in local storage, rendering previously generated
-                addresses irretrievable.
-              </DialogContentText>
-            </DialogContent>
-            <DialogActions>
-              <Button
-                onClick={() => {
-                  setShowResetDialog(false);
-                }}
-              >
-                Cancel
-              </Button>
-              <Button
-                onClick={() => {
-                  resetLocalState();
-                }}
-              >
-                Confirm
-              </Button>
-            </DialogActions>
-          </Dialog>
-        </Stack>
-        <Stack direction="row" alignItems="center" spacing={4}>
-          <Typography>
-            <a
-              href="https://github.com/jovicheng/sui-zklogin-demo"
-              target="_blank"
-            >
-              @ Github Repo
-            </a>
-          </Typography>
-          <Typography>
-            <a href="https://github.com/jovicheng" target="_blank">
-              @ Jovi
-            </a>
-          </Typography>
         </Stack>
       </Box>
-      {/* devnet unavailable Alert   */}
-      {/* <Alert
-        severity="error"
-        sx={{
-          mb: "36px",
-          fontWeight: 600,
-        }}
-      >
-        Sui Devnet node is currently unavailable, and the demo process may not
-        be completed.
-      </Alert> */}
       <Box
         sx={{
           width: "100%",
@@ -481,28 +452,10 @@ function App() {
                 variant="contained"
                 disabled={Boolean(ephemeralKeyPair)}
                 onClick={() => {
-                  const ephemeralKeyPair = Ed25519Keypair.generate();
-                  window.sessionStorage.setItem(
-                    KEY_PAIR_SESSION_STORAGE_KEY,
-                    ephemeralKeyPair.export().privateKey
-                  );
-                  setEphemeralKeyPair(ephemeralKeyPair);
+                  doCryptoStuff();
                 }}
               >
                 Create random ephemeral KeyPair{" "}
-              </Button>
-              <Button
-                variant="contained"
-                color="error"
-                disabled={!ephemeralKeyPair}
-                onClick={() => {
-                  window.sessionStorage.removeItem(
-                    KEY_PAIR_SESSION_STORAGE_KEY
-                  );
-                  setEphemeralKeyPair(undefined);
-                }}
-              >
-                Clear ephemeral KeyPair{" "}
               </Button>
             </Stack>
             <Typography>
@@ -677,25 +630,25 @@ ${JSON.stringify(ephemeralKeyPair?.getPublicKey().toBase64())}`}
                 variant="contained"
                 onClick={() => {
                   const params = new URLSearchParams({
-                    client_id: CLIENT_ID,
+                    client_id: REST_API_KEY,
                     redirect_uri: REDIRECT_URI,
-                    response_type: "id_token",
+                    response_type: "code",
                     scope: "openid",
                     nonce: nonce,
                   });
-                  const loginURL = `https://accounts.google.com/o/oauth2/v2/auth?${params}`;
+                  const loginURL = `https://kauth.kakao.com/oauth/authorize?${params}`;
                   window.location.replace(loginURL);
                 }}
               >
                 <img
-                  src={GoogleLogo}
-                  width="16px"
+                  src={KakaoLogo}
+                  width="100px"
                   style={{
                     marginRight: "8px",
                   }}
-                  alt="Google"
+                  alt="Kakao"
                 />{" "}
-                Sign In With Google
+                Sign In With Kakao
               </Button>
             </Box>
           </Stack>
@@ -720,7 +673,7 @@ ${JSON.stringify(ephemeralKeyPair?.getPublicKey().toBase64())}`}
                   fontWeight: 600,
                 }}
               >
-                Successfully logged in via Google!
+                Successfully logged in via Kakao!
               </Alert>
             )}
             <Box sx={{ m: "16px 0" }}>
@@ -1010,7 +963,7 @@ ${JSON.stringify(decodedJwt, null, 2)}`}
               loading={fetchingZKProof}
               variant="contained"
               disabled={
-                !oauthParams?.id_token ||
+                !idToken ||
                 !extendedEphemeralPublicKey ||
                 !maxEpoch ||
                 !randomness ||
