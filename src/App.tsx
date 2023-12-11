@@ -1,12 +1,5 @@
 import { LoadingButton } from "@mui/lab";
-import {
-  Alert,
-  Box,
-  Button,
-  ButtonGroup,
-  Stack,
-  Typography,
-} from "@mui/material";
+import { Alert, Box, Button, Stack, Typography } from "@mui/material";
 import { fromB64 } from "@mysten/bcs";
 import { useSuiClientQuery } from "@mysten/dapp-kit";
 import { SuiClient } from "@mysten/sui.js/client";
@@ -50,7 +43,6 @@ import {
   SUI_PROVER_DEV_ENDPOINT,
   USER_SALT_LOCAL_STORAGE_KEY,
 } from "./constant";
-import { base, gray } from "./theme/colors";
 
 export type PartialZkLoginSignature = Omit<
   Parameters<typeof getZkLoginSignature>["0"]["inputs"],
@@ -320,47 +312,47 @@ function App() {
         className="border border-slate-300 rounded-xl"
       >
         {/* Step 1 */}
-        {activeStep === 0 && (
-          <Stack spacing={2}>
-            <Typography
-              sx={{
-                fontSize: "1.25rem",
-                fontWeight: 600,
-                mb: "12px !important",
+
+        <Stack spacing={2}>
+          <Typography
+            sx={{
+              fontSize: "1.25rem",
+              fontWeight: 600,
+              mb: "12px !important",
+            }}
+          >
+            {t("431375b3")}
+          </Typography>
+          <Typography>
+            <Trans i18nKey={"62a0a307"}>
+              The ephemeral key pair is used to sign the
+              <code>TransactionBlock</code>
+            </Trans>
+          </Typography>
+          <Typography>{t("9ec629a8")} (Session Storage)</Typography>
+          <Stack direction="row" spacing={2}>
+            <Button
+              variant="contained"
+              disabled={Boolean(ephemeralKeyPair)}
+              onClick={() => {
+                doCryptoStuff();
               }}
             >
-              {t("431375b3")}
-            </Typography>
-            <Typography>
-              <Trans i18nKey={"62a0a307"}>
-                The ephemeral key pair is used to sign the
-                <code>TransactionBlock</code>
-              </Trans>
-            </Typography>
-            <Typography>{t("9ec629a8")} (Session Storage)</Typography>
-            <Stack direction="row" spacing={2}>
-              <Button
-                variant="contained"
-                disabled={Boolean(ephemeralKeyPair)}
-                onClick={() => {
-                  doCryptoStuff();
-                }}
-              >
-                Create random ephemeral KeyPair{" "}
-              </Button>
-            </Stack>
-            <Typography>
-              <SyntaxHighlighter wrapLongLines language="json" style={oneDark}>
-                {`// PrivateKey
-${JSON.stringify(ephemeralKeyPair?.export())}`}
-              </SyntaxHighlighter>
-              <SyntaxHighlighter wrapLongLines language="json" style={oneDark}>
-                {`// PublicKey:
-${JSON.stringify(ephemeralKeyPair?.getPublicKey().toBase64())}`}
-              </SyntaxHighlighter>
-            </Typography>
+              Create random ephemeral KeyPair{" "}
+            </Button>
           </Stack>
-        )}
+          <Typography>
+            <SyntaxHighlighter wrapLongLines language="json" style={oneDark}>
+              {`// PrivateKey
+${JSON.stringify(ephemeralKeyPair?.export())}`}
+            </SyntaxHighlighter>
+            <SyntaxHighlighter wrapLongLines language="json" style={oneDark}>
+              {`// PublicKey:
+${JSON.stringify(ephemeralKeyPair?.getPublicKey().toBase64())}`}
+            </SyntaxHighlighter>
+          </Typography>
+        </Stack>
+
         {/* Step 2 */}
 
         <Stack spacing={2}>
@@ -856,7 +848,7 @@ ${JSON.stringify(decodedJwt, null, 2)}`}
                 const zkProofResult = await axios.post(
                   SUI_PROVER_DEV_ENDPOINT,
                   {
-                    jwt: oauthParams?.id_token as string,
+                    jwt: idToken as string,
                     extendedEphemeralPublicKey: extendedEphemeralPublicKey,
                     maxEpoch: maxEpoch,
                     jwtRandomness: randomness,
