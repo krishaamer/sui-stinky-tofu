@@ -99,6 +99,25 @@ function App() {
   }, [location]);
 
   useEffect(() => {
+    const fetchEpochData = async () => {
+      try {
+        const { epoch } = await suiClient.getLatestSuiSystemState();
+        setCurrentEpoch(epoch);
+        window.localStorage.setItem(
+          MAX_EPOCH_LOCAL_STORAGE_KEY,
+          String(Number(epoch) + 10)
+        );
+        setMaxEpoch(Number(epoch) + 10);
+      } catch (error) {
+        console.error("Error fetching epoch data:", error);
+        // Handle errors appropriately
+      }
+    };
+
+    fetchEpochData();
+  }, [randomness]);
+
+  useEffect(() => {
     const privateKey = window.sessionStorage.getItem(
       KEY_PAIR_SESSION_STORAGE_KEY
     );
@@ -224,12 +243,19 @@ function App() {
   };
 
   const doCryptoStuff = () => {
+
+    // Step 1
     const ephemeralKeyPair = Ed25519Keypair.generate();
     window.sessionStorage.setItem(
       KEY_PAIR_SESSION_STORAGE_KEY,
       ephemeralKeyPair.export().privateKey
     );
     setEphemeralKeyPair(ephemeralKeyPair);
+
+    // Step 3
+    const randomness = generateRandomness();
+    window.sessionStorage.setItem(RANDOMNESS_SESSION_STORAGE_KEY, randomness);
+    setRandomness(randomness);
   };
 
   return (
@@ -305,15 +331,6 @@ function App() {
         {/* Step 1 */}
 
         <Stack spacing={2}>
-          <Typography
-            sx={{
-              fontSize: "1.25rem",
-              fontWeight: 600,
-              mb: "12px !important",
-            }}
-          >
-            {t("431375b3")}
-          </Typography>
           <Stack direction="row" spacing={2}>
             <Button
               variant="contained"
@@ -347,29 +364,10 @@ ${JSON.stringify(ephemeralKeyPair?.getPublicKey().toBase64())}`}
               flexDirection: "column",
             }}
           >
-            <Button
-              variant="contained"
-              size="small"
-              onClick={async () => {
-                const { epoch } = await suiClient.getLatestSuiSystemState();
-
-                setCurrentEpoch(epoch);
-                window.localStorage.setItem(
-                  MAX_EPOCH_LOCAL_STORAGE_KEY,
-                  String(Number(epoch) + 10)
-                );
-                setMaxEpoch(Number(epoch) + 10);
-              }}
-            >
-              {t("3a96f638")}
-            </Button>
             <Box sx={{ mt: "6px" }}>
               {t("6d47d563")}{" "}
-              <code>{currentEpoch || "Click the button above to obtain"}</code>
+              <code>{currentEpoch}</code>
             </Box>
-            <Typography sx={{ mt: "6px" }}>
-              {t("6a747813")} <code>maxEpoch:{maxEpoch}</code>
-            </Typography>
           </Box>
           <Box
             sx={{
@@ -378,20 +376,6 @@ ${JSON.stringify(ephemeralKeyPair?.getPublicKey().toBase64())}`}
           >
           </Box>
           <Stack direction="row" spacing={1} alignItems="center">
-            <Button
-              variant="contained"
-              size="small"
-              onClick={() => {
-                const randomness = generateRandomness();
-                window.sessionStorage.setItem(
-                  RANDOMNESS_SESSION_STORAGE_KEY,
-                  randomness
-                );
-                setRandomness(randomness);
-              }}
-            >
-              {t("2e2913c8")}
-            </Button>
             <Typography>
               <code>randomness: {randomness}</code>
             </Typography>
