@@ -436,16 +436,6 @@ ${JSON.stringify(ephemeralKeyPair?.getPublicKey().toBase64())}`}
               mt: "16px",
             }}
           >
-            <SyntaxHighlighter
-              wrapLongLines
-              language="typescript"
-              style={oneDark}
-            >
-              {`import { generateRandomness } from '@mysten/zklogin';
-                
- // randomness
- const randomness = generateRandomness();`}
-            </SyntaxHighlighter>
           </Box>
           <Stack direction="row" spacing={1} alignItems="center">
             <Button
@@ -467,13 +457,6 @@ ${JSON.stringify(ephemeralKeyPair?.getPublicKey().toBase64())}`}
             </Typography>
           </Stack>
           <Box>
-            <SyntaxHighlighter
-              wrapLongLines
-              language="typescript"
-              style={oneDark}
-            >
-              {GENERATE_NONCE}
-            </SyntaxHighlighter>
             <Stack direction="row" alignItems="center" spacing={1}>
               <Button
                 variant="contained"
@@ -557,24 +540,6 @@ ${JSON.stringify(ephemeralKeyPair?.getPublicKey().toBase64())}`}
           <Box sx={{ m: "16px 0" }}>
             UrlQuery: <code>id_token</code>
           </Box>
-          <SyntaxHighlighter
-            wrapLongLines
-            wrapLines
-            language="typescript"
-            style={oneDark}
-          >
-            {`// id_token Header.Payload.Signature
-${JSON.stringify(jwtString)}
-
-import { JwtPayload, jwtDecode } from "jwt-decode";
-
-const jwtPayload = jwtDecode(id_token);
-const decodedJwt = jwt_decode(jwtPayload) as JwtPayload;`}
-          </SyntaxHighlighter>
-          <SyntaxHighlighter wrapLongLines language="json" style={oneDark}>
-            {`// JWT Payload
-${JSON.stringify(decodedJwt, null, 2)}`}
-          </SyntaxHighlighter>
           <Stack
             spacing={1}
             sx={{
@@ -693,15 +658,6 @@ ${JSON.stringify(decodedJwt, null, 2)}`}
               <code>aud</code> 都不会变。
             </Trans>
           </Typography>
-          <SyntaxHighlighter
-            wrapLongLines
-            language="typescript"
-            style={oneDark}
-          >
-            {`import { jwtToAddress } from "@mysten/zklogin";
-
- const zkLoginUserAddress = jwtToAddress(jwt, userSalt);`}
-          </SyntaxHighlighter>
           <Box>
             <Button
               variant="contained"
@@ -785,17 +741,6 @@ ${JSON.stringify(decodedJwt, null, 2)}`}
           </Typography>
           <Typography>{t("446760ac")}</Typography>
           <Typography>{t("c5c9e603")}</Typography>
-          <SyntaxHighlighter
-            wrapLongLines
-            language="typescript"
-            style={oneDark}
-          >
-            {`import { getExtendedEphemeralPublicKey } from "@mysten/zklogin";
-              
- const extendedEphemeralPublicKey = getExtendedEphemeralPublicKey(
-   ephemeralKeyPair.getPublicKey()
- );`}
-          </SyntaxHighlighter>
           <Box>
             <Button
               variant="contained"
@@ -825,13 +770,6 @@ ${JSON.stringify(decodedJwt, null, 2)}`}
             </Typography>
           </Box>
           <Typography>{t(`16ebd660`)}</Typography>
-          <SyntaxHighlighter
-            wrapLongLines
-            language="typescript"
-            style={oneDark}
-          >
-            {AXIOS_ZKPROOF}
-          </SyntaxHighlighter>
           <LoadingButton
             loading={fetchingZKProof}
             variant="contained"
@@ -881,15 +819,6 @@ ${JSON.stringify(decodedJwt, null, 2)}`}
           >
             {t("33893c96")}
           </LoadingButton>
-          {zkProof && (
-            <SyntaxHighlighter
-              wrapLongLines
-              language="typescript"
-              style={oneDark}
-            >
-              {JSON.stringify(zkProof, null, 2)}
-            </SyntaxHighlighter>
-          )}
         </Stack>
 
         {/* Step 7 */}
@@ -906,13 +835,6 @@ ${JSON.stringify(decodedJwt, null, 2)}`}
           </Typography>
           <Alert severity="warning">{t("d58c9e1e")}</Alert>
           <Typography sx={{ mt: "12px" }}>{t("6591b962")}</Typography>
-          <SyntaxHighlighter
-            wrapLongLines
-            language="typescript"
-            style={oneDark}
-          >
-            {BUILD_ZKLOGIN_SIGNATURE}
-          </SyntaxHighlighter>
           <div className="card">
             <LoadingButton
               loading={executingTxn}
