@@ -470,61 +470,14 @@ function App() {
               </Alert>
             )}
             <LoadingButton
-            variant="contained"
-            size="medium"
-            loading={requestingFaucet}
-            disabled={!zkLoginUserAddress}
-            onClick={requestFaucet}
-          >
-            +Free Gas
-          </LoadingButton>
-            <Button
-              variant="outlined"
-              color="error"
-              size="small"
-              onClick={() => {
-                resetLocalState();
-              }}
+              variant="contained"
+              size="medium"
+              loading={requestingFaucet}
+              disabled={!zkLoginUserAddress}
+              onClick={requestFaucet}
             >
-              Reset
-            </Button>
-          </Stack>
-          <Typography>
-            <code>
-              {`Private Key ${JSON.stringify(ephemeralKeyPair?.export())}`}
-            </code>
-          </Typography>
-          <Typography>
-            <code>
-              {`Public Key: ${JSON.stringify(
-                ephemeralKeyPair?.getPublicKey().toBase64()
-              )}`}
-            </code>
-          </Typography>
-          <Typography>
-            <code>{`Current Epoch: ${currentEpoch}`}</code>
-          </Typography>
-          <Typography>
-            <code>{`Randomness: ${randomness}`}</code>
-          </Typography>
-          <Typography>
-            <code>{`Nonce: ${nonce}`}</code>
-          </Typography>
-          <Typography>
-            <code>{`Salt: ${userSalt}`}</code>
-          </Typography>
-          <Typography>
-            <code>{`ID Token: ${idToken}`}</code>
-          </Typography>
-          <Typography>
-            <code>{`User SUI Address: ${zkLoginUserAddress}`}</code>
-          </Typography>
-          <Typography>
-            <code>{`extendedEphemeralPublicKey ${extendedEphemeralPublicKey}`}</code>
-          </Typography>
-        </Stack>
-        <Box>
-          <div className="card">
+              +Free Gas
+            </LoadingButton>
             <LoadingButton
               loading={executingTxn}
               variant="contained"
@@ -596,8 +549,55 @@ function App() {
                 }
               }}
             >
-              Execute Transaction Block
+              Save
             </LoadingButton>
+            <Button
+              variant="outlined"
+              color="error"
+              size="small"
+              onClick={() => {
+                resetLocalState();
+              }}
+            >
+              Reset
+            </Button>
+          </Stack>
+          <Typography>
+            <code>
+              {`Private Key ${JSON.stringify(ephemeralKeyPair?.export())}`}
+            </code>
+          </Typography>
+          <Typography>
+            <code>
+              {`Public Key: ${JSON.stringify(
+                ephemeralKeyPair?.getPublicKey().toBase64()
+              )}`}
+            </code>
+          </Typography>
+          <Typography>
+            <code>{`Current Epoch: ${currentEpoch}`}</code>
+          </Typography>
+          <Typography>
+            <code>{`Randomness: ${randomness}`}</code>
+          </Typography>
+          <Typography>
+            <code>{`Nonce: ${nonce}`}</code>
+          </Typography>
+          <Typography>
+            <code>{`Salt: ${userSalt}`}</code>
+          </Typography>
+          <Typography>
+            <code>{`ID Token: ${idToken}`}</code>
+          </Typography>
+          <Typography>
+            <code>{`User SUI Address: ${zkLoginUserAddress}`}</code>
+          </Typography>
+          <Typography>
+            <code>{`extendedEphemeralPublicKey ${extendedEphemeralPublicKey}`}</code>
+          </Typography>
+        </Stack>
+        <Box>
+       
             {executeDigest && (
               <Alert severity="success" sx={{ mt: "12px" }}>
                 Execution successful:{" "}
@@ -617,7 +617,7 @@ function App() {
                 </Typography>
               </Alert>
             )}
-          </div>
+    
         </Box>
       </Box>
     </Box>
