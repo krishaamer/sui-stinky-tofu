@@ -23,8 +23,6 @@ import queryString from "query-string";
 import { useEffect, useState } from "react";
 import { Trans, useTranslation } from "react-i18next";
 import { useLocation, useNavigate } from "react-router-dom";
-import { Prism as SyntaxHighlighter } from "react-syntax-highlighter";
-import { oneDark } from "react-syntax-highlighter/dist/esm/styles/prism";
 import "./App.css";
 import KakaoLogo from "./assets/kakao.png";
 import {
@@ -144,6 +142,28 @@ function App() {
       setMaxEpoch(Number(maxEpoch));
     }
   }, []);
+
+
+  useEffect(() => {
+
+     const fetchNonce = async () => {
+       try {
+         const nonce = await generateNonce(
+           ephemeralKeyPair.getPublicKey(),
+           maxEpoch,
+           randomness
+         );
+         setNonce(nonce);
+       } catch (error) {
+         console.error("Error fetching epoch data:", error);
+         // Handle errors appropriately
+       }
+     }
+     
+    fetchNonce();
+
+  }, [ephemeralKeyPair, maxEpoch, currentEpoch, randomness]);
+
 
   // query zkLogin address balance
   const { data: addressBalance } = useSuiClientQuery(
@@ -281,16 +301,6 @@ function App() {
           >
             SUI ZIRAN{" "}
           </Typography>
-          <Button
-            variant="contained"
-            color="error"
-            size="small"
-            onClick={() => {
-              resetLocalState();
-            }}
-          >
-            Reset LocalState
-          </Button>
         </Stack>
       </Box>
 
@@ -334,79 +344,51 @@ function App() {
           <Stack direction="row" spacing={2}>
             <Button
               variant="contained"
-              disabled={Boolean(ephemeralKeyPair)}
+              //disabled={Boolean(ephemeralKeyPair)}
               onClick={() => {
                 doCryptoStuff();
               }}
             >
-              Create random ephemeral KeyPair{" "}
+              Do Crypto Stuff
+            </Button>
+            <Button
+              variant="contained"
+              color="error"
+              size="small"
+              onClick={() => {
+                resetLocalState();
+              }}
+            >
+              Reset Data
             </Button>
           </Stack>
           <Typography>
-            <SyntaxHighlighter wrapLongLines language="json" style={oneDark}>
-              {`// PrivateKey
-${JSON.stringify(ephemeralKeyPair?.export())}`}
-            </SyntaxHighlighter>
-            <SyntaxHighlighter wrapLongLines language="json" style={oneDark}>
-              {`// PublicKey:
-${JSON.stringify(ephemeralKeyPair?.getPublicKey().toBase64())}`}
-            </SyntaxHighlighter>
+            <code>
+              {`Private Key ${JSON.stringify(ephemeralKeyPair?.export())}`}
+            </code>
+          </Typography>
+          <Typography>
+            <code>
+              {`Public Key: ${JSON.stringify(
+                ephemeralKeyPair?.getPublicKey().toBase64()
+              )}`}
+            </code>
+          </Typography>
+          <Typography>
+            <code>{`Current Epoch: ${currentEpoch}`}</code>
+          </Typography>
+          <Typography>
+            <code>{`Randomness: ${randomness}`}</code>
+          </Typography>
+          <Typography>
+            <code>{`Nonce: ${nonce}`}</code>
           </Typography>
         </Stack>
 
         {/* Step 2 */}
 
         <Stack spacing={2}>
-          <Box
-            sx={{
-              display: "flex",
-              alignItems: "flex-start",
-              flexDirection: "column",
-            }}
-          >
-            <Box sx={{ mt: "6px" }}>
-              {t("6d47d563")}{" "}
-              <code>{currentEpoch}</code>
-            </Box>
-          </Box>
-          <Box
-            sx={{
-              mt: "16px",
-            }}
-          >
-          </Box>
-          <Stack direction="row" spacing={1} alignItems="center">
-            <Typography>
-              <code>randomness: {randomness}</code>
-            </Typography>
-          </Stack>
           <Box>
-            <Stack direction="row" alignItems="center" spacing={1}>
-              <Button
-                variant="contained"
-                disabled={
-                  !ephemeralKeyPair || !maxEpoch || !currentEpoch || !randomness
-                }
-                onClick={() => {
-                  if (!ephemeralKeyPair) {
-                    return;
-                  }
-                  const nonce = generateNonce(
-                    ephemeralKeyPair.getPublicKey(),
-                    maxEpoch,
-                    randomness
-                  );
-                  setNonce(nonce);
-                }}
-              >
-                Generate Nonce
-              </Button>
-              {nonce && (
-                <Typography>
-                  nonce: <code>{nonce}</code>
-                </Typography>
-              )}
-            </Stack>
             <Button
               sx={{
                 mt: "24px",
