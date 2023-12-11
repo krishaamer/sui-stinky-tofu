@@ -357,7 +357,6 @@ function App() {
   };
 
   const doCryptoStuff = () => {
-    // Step 1
     const ephemeralKeyPair = Ed25519Keypair.generate();
     window.sessionStorage.setItem(
       KEY_PAIR_SESSION_STORAGE_KEY,
@@ -365,7 +364,6 @@ function App() {
     );
     setEphemeralKeyPair(ephemeralKeyPair);
 
-    // Step 3
     const randomness = generateRandomness();
     window.sessionStorage.setItem(RANDOMNESS_SESSION_STORAGE_KEY, randomness);
     setRandomness(randomness);
@@ -471,6 +469,15 @@ function App() {
                 Logged in via Kakao!
               </Alert>
             )}
+            <LoadingButton
+            variant="contained"
+            size="medium"
+            loading={requestingFaucet}
+            disabled={!zkLoginUserAddress}
+            onClick={requestFaucet}
+          >
+            +Free Gas
+          </LoadingButton>
             <Button
               variant="outlined"
               color="error"
@@ -515,21 +522,6 @@ function App() {
           <Typography>
             <code>{`extendedEphemeralPublicKey ${extendedEphemeralPublicKey}`}</code>
           </Typography>
-        </Stack>
-
-        <Stack spacing={2}>
-          <LoadingButton
-            variant="contained"
-            sx={{
-              ml: "24px",
-            }}
-            size="small"
-            loading={requestingFaucet}
-            disabled={!zkLoginUserAddress}
-            onClick={requestFaucet}
-          >
-            Request Test SUI Token
-          </LoadingButton>
         </Stack>
         <Box>
           <div className="card">
