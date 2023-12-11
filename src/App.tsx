@@ -28,11 +28,6 @@ import { oneDark } from "react-syntax-highlighter/dist/esm/styles/prism";
 import "./App.css";
 import KakaoLogo from "./assets/kakao.png";
 import {
-  AXIOS_ZKPROOF,
-  BUILD_ZKLOGIN_SIGNATURE,
-  GENERATE_NONCE,
-} from "./code_example";
-import {
   REST_API_KEY,
   FULLNODE_URL,
   KEY_PAIR_SESSION_STORAGE_KEY,
@@ -68,7 +63,6 @@ function App() {
     useState("");
   const [maxEpoch, setMaxEpoch] = useState(0);
   const [randomness, setRandomness] = useState("");
-  const [activeStep, setActiveStep] = useState(0);
   const [fetchingZKProof, setFetchingZKProof] = useState(false);
   const [executingTxn, setExecutingTxn] = useState(false);
   const [executeDigest, setExecuteDigest] = useState("");
@@ -93,7 +87,6 @@ function App() {
       const decodedJwt = jwtDecode(idToken);
       setJwtString(idToken as string);
       setDecodedJwt(decodedJwt);
-      setActiveStep(2);
     }
   }, [oauthParams, idToken]);
 
@@ -158,7 +151,6 @@ function App() {
     setExtendedEphemeralPublicKey("");
     setMaxEpoch(0);
     setRandomness("");
-    setActiveStep(0);
     setFetchingZKProof(false);
     setExecutingTxn(false);
     setExecuteDigest("");
@@ -170,7 +162,6 @@ function App() {
       window.localStorage.clear();
       resetState();
       navigate(`/`);
-      setActiveStep(0);
       enqueueSnackbar("Reset successful", {
         variant: "success",
       });
@@ -323,13 +314,6 @@ function App() {
           >
             {t("431375b3")}
           </Typography>
-          <Typography>
-            <Trans i18nKey={"62a0a307"}>
-              The ephemeral key pair is used to sign the
-              <code>TransactionBlock</code>
-            </Trans>
-          </Typography>
-          <Typography>{t("9ec629a8")} (Session Storage)</Typography>
           <Stack direction="row" spacing={2}>
             <Button
               variant="contained"
@@ -356,50 +340,6 @@ ${JSON.stringify(ephemeralKeyPair?.getPublicKey().toBase64())}`}
         {/* Step 2 */}
 
         <Stack spacing={2}>
-          <Typography
-            sx={{
-              fontSize: "1.25rem",
-              fontWeight: 600,
-              mb: "12px !important",
-            }}
-          >
-            {t("4f04f1f8")} (from OpenID Provider)
-          </Typography>
-          <Typography>{t("56adebff")}</Typography>
-          <Stack spacing={1}>
-            <Typography>
-              1. {"  "}
-              <code>$CLIENT_ID</code> {t("e062b220")}
-            </Typography>
-            <Typography>
-              2. <code>$REDIRECT_URL</code> {t("ab92f814")}
-            </Typography>
-            <Typography>
-              3. <code>$NONCE</code>
-              {"  "}
-              <Trans i18nKey={"2397bcd8"}>
-                （Generated through<code>ephemeralKeyPair</code>
-                <code>maxEpoch</code>
-                <code>randomness</code>）
-              </Trans>
-            </Typography>
-            <Stack
-              spacing={1}
-              sx={{
-                m: "12px 0px !important",
-              }}
-            >
-              <Typography>
-                <code>*ephemeralKeyPair</code>: {t("4274e146")}
-              </Typography>
-              <Typography>
-                <code>*maxEpoch</code>: {t("bf54d75b")}
-              </Typography>
-              <Typography>
-                <code>*randomness</code>: {t("4a7add7c")}
-              </Typography>
-            </Stack>
-          </Stack>
           <Box
             sx={{
               display: "flex",
@@ -540,37 +480,6 @@ ${JSON.stringify(ephemeralKeyPair?.getPublicKey().toBase64())}`}
           <Box sx={{ m: "16px 0" }}>
             UrlQuery: <code>id_token</code>
           </Box>
-          <Stack
-            spacing={1}
-            sx={{
-              m: "24px 0",
-            }}
-          >
-            <Typography>
-              <code>iss (issuer)</code>：<b>{t("c20d7af6")}</b>
-            </Typography>
-            <Typography>
-              <code>aud (audience)</code>：<b>{t("e9286432")}</b>
-            </Typography>
-            <Typography>
-              <code>sub (subject)</code>：<b>{t("0ac23a36")}</b>
-            </Typography>
-            <Typography>
-              <code>nonce</code>：{t("20547967")}
-            </Typography>
-            <Typography>
-              <code>nbf (Not Before)</code>：{t("060c9525")}
-            </Typography>
-            <Typography>
-              <code>iat(Issued At)</code>：{t("5bbacff6")}
-            </Typography>
-            <Typography>
-              <code>exp (expiration time)</code>：{t("3caf36d5")}
-            </Typography>
-            <Typography>
-              <code>jti (JWT ID)</code>：{t("64ab7f15")}
-            </Typography>
-          </Stack>
         </Box>
 
         {/* Step 4 */}
@@ -594,12 +503,6 @@ ${JSON.stringify(ephemeralKeyPair?.getPublicKey().toBase64())}`}
           >
             {t("cb63dedd")}
           </Alert>
-          <Trans i18nKey={"c4a666f0"}>
-            <Typography>保存在哪：</Typography>
-            <Typography>1.要求用户记住(发送到用户邮箱)</Typography>
-            <Typography>2.储存在客户端(浏览器)</Typography>
-            <Typography>3.保存在APP Backend数据库，与UID一一对应</Typography>
-          </Trans>
           <Stack
             direction="row"
             alignItems="center"
@@ -649,14 +552,6 @@ ${JSON.stringify(ephemeralKeyPair?.getPublicKey().toBase64())}`}
             }}
           >
             {t("2fb333f5")}
-          </Typography>
-          <Typography>
-            <Trans i18nKey="e05797f4">
-              用户 Sui 地址由 <code>sub</code> 、 <code>iss</code> 、
-              <code>aud</code> 和 <code>user_salt</code> 共同决定，对于同一个
-              JWT，每次登陆时 <code>sub</code> 、 <code>iss</code> 、
-              <code>aud</code> 都不会变。
-            </Trans>
           </Typography>
           <Box>
             <Button
