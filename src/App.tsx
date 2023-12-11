@@ -143,27 +143,114 @@ function App() {
     }
   }, []);
 
-
   useEffect(() => {
+    const fetchNonce = async () => {
+      try {
+        const nonce = await generateNonce(
+          ephemeralKeyPair.getPublicKey(),
+          maxEpoch,
+          randomness
+        );
+        setNonce(nonce);
+      } catch (error) {
+        console.error("Error fetching nonce data:", error);
+        // Handle errors appropriately
+      }
+    };
 
-     const fetchNonce = async () => {
-       try {
-         const nonce = await generateNonce(
-           ephemeralKeyPair.getPublicKey(),
-           maxEpoch,
-           randomness
-         );
-         setNonce(nonce);
-       } catch (error) {
-         console.error("Error fetching epoch data:", error);
-         // Handle errors appropriately
-       }
-     }
-     
     fetchNonce();
-
   }, [ephemeralKeyPair, maxEpoch, currentEpoch, randomness]);
 
+  useEffect(() => {
+    const fetchSalt = async () => {
+      try {
+        const salt = await generateRandomness();
+        window.localStorage.setItem(USER_SALT_LOCAL_STORAGE_KEY, salt);
+        setUserSalt(salt);
+      } catch (error) {
+        console.error("Error fetching randomness data:", error);
+        // Handle errors appropriately
+      }
+    };
+
+    fetchSalt();
+  }, [randomness]);
+
+  useEffect(() => {
+    const fetchUserAddress = async () => {
+      try {
+        const zkLoginUserAddress = await jwtToAddress(jwtString, userSalt);
+        setZkLoginUserAddress(zkLoginUserAddress);
+      } catch (error) {
+        console.error("Error fetching address data:", error);
+        // Handle errors appropriately
+      }
+    };
+
+    fetchUserAddress();
+  }, [jwtString, userSalt]);
+
+  useEffect(() => {
+    const fetchZKProof = async () => {
+      try {
+        setFetchingZKProof(true);
+        const zkProofResult = await axios.post(
+          SUI_PROVER_DEV_ENDPOINT,
+          {
+            jwt: idToken as string,
+            extendedEphemeralPublicKey: extendedEphemeralPublicKey,
+            maxEpoch: maxEpoch,
+            jwtRandomness: randomness,
+            salt: userSalt,
+            keyClaimName: "sub",
+          },
+          {
+            headers: {
+              "Content-Type": "application/json",
+            },
+          }
+        );
+        setZkProof(zkProofResult.data as PartialZkLoginSignature);
+        enqueueSnackbar("Successfully obtain ZK Proof", {
+          variant: "success",
+        });
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      } catch (error: any) {
+        console.error(error);
+        enqueueSnackbar(String(error?.response?.data?.message || error), {
+          variant: "error",
+        });
+      } finally {
+        setFetchingZKProof(false);
+      }
+    };
+
+    fetchZKProof();
+  }, [
+    idToken,
+    extendedEphemeralPublicKey,
+    maxEpoch,
+    randomness,
+    userSalt,
+    ephemeralKeyPair,
+  ]);
+
+  useEffect(() => {
+    const fetchExtendedEphemeralPublicKey = async () => {
+      try {
+        const extendedEphemeralPublicKey = await getExtendedEphemeralPublicKey(
+          ephemeralKeyPair.getPublicKey()
+        );
+
+        setExtendedEphemeralPublicKey(extendedEphemeralPublicKey);
+      } catch (error) {
+        console.error("Error fetching address data:", error);
+        // Handle errors appropriately
+      }
+    };
+
+    fetchExtendedEphemeralPublicKey();
+  }, [ephemeralKeyPair]);
 
   // query zkLogin address balance
   const { data: addressBalance } = useSuiClientQuery(
@@ -180,6 +267,7 @@ function App() {
   const resetState = () => {
     setCurrentEpoch("");
     setNonce("");
+    setIdToken("");
     setOauthParams(undefined);
     setZkLoginUserAddress("");
     setDecodedJwt(undefined);
@@ -263,7 +351,6 @@ function App() {
   };
 
   const doCryptoStuff = () => {
-
     // Step 1
     const ephemeralKeyPair = Ed25519Keypair.generate();
     window.sessionStorage.setItem(
@@ -338,13 +425,10 @@ function App() {
         }}
         className="border border-slate-300 rounded-xl"
       >
-        {/* Step 1 */}
-
         <Stack spacing={2}>
           <Stack direction="row" spacing={2}>
             <Button
               variant="contained"
-              //disabled={Boolean(ephemeralKeyPair)}
               onClick={() => {
                 doCryptoStuff();
               }}
@@ -352,47 +436,6 @@ function App() {
               Do Crypto Stuff
             </Button>
             <Button
-              variant="contained"
-              color="error"
-              size="small"
-              onClick={() => {
-                resetLocalState();
-              }}
-            >
-              Reset Data
-            </Button>
-          </Stack>
-          <Typography>
-            <code>
-              {`Private Key ${JSON.stringify(ephemeralKeyPair?.export())}`}
-            </code>
-          </Typography>
-          <Typography>
-            <code>
-              {`Public Key: ${JSON.stringify(
-                ephemeralKeyPair?.getPublicKey().toBase64()
-              )}`}
-            </code>
-          </Typography>
-          <Typography>
-            <code>{`Current Epoch: ${currentEpoch}`}</code>
-          </Typography>
-          <Typography>
-            <code>{`Randomness: ${randomness}`}</code>
-          </Typography>
-          <Typography>
-            <code>{`Nonce: ${nonce}`}</code>
-          </Typography>
-        </Stack>
-
-        {/* Step 2 */}
-
-        <Stack spacing={2}>
-          <Box>
-            <Button
-              sx={{
-                mt: "24px",
-              }}
               disabled={!nonce}
               variant="contained"
               onClick={() => {
@@ -417,285 +460,72 @@ function App() {
               />{" "}
               Sign In With Kakao
             </Button>
-          </Box>
-        </Stack>
-
-        {/* Step 3 */}
-
-        <Box>
-          <Typography
-            sx={{
-              fontSize: "1.25rem",
-              fontWeight: 600,
-              mb: "12px !important",
-            }}
-          >
-            {t("ef410d70")}
-          </Typography>
-          {decodedJwt && (
-            <Alert
-              variant="standard"
-              color="success"
-              sx={{
-                fontWeight: 600,
-              }}
-            >
-              Successfully logged in via Kakao!
-            </Alert>
-          )}
-          <Box sx={{ m: "16px 0" }}>
-            UrlQuery: <code>id_token</code>
-          </Box>
-        </Box>
-
-        {/* Step 4 */}
-
-        <Stack spacing={2}>
-          <Typography
-            sx={{
-              fontSize: "1.25rem",
-              fontWeight: 600,
-              mb: "12px !important",
-            }}
-          >
-            {t("b7c54098")}
-          </Typography>
-          <Typography>{t("ec71ef53")}</Typography>
-          <Alert
-            severity="warning"
-            sx={{
-              fontWeight: 600,
-            }}
-          >
-            {t("cb63dedd")}
-          </Alert>
-          <Stack
-            direction="row"
-            alignItems="center"
-            spacing={2}
-            sx={{
-              mt: "12px!important",
-            }}
-          >
+            {idToken && (
+              <Alert variant="outlined" color="success">
+                Logged in via Kakao!
+              </Alert>
+            )}
             <Button
-              variant="contained"
-              disabled={Boolean(userSalt)}
-              onClick={() => {
-                const salt = generateRandomness();
-                window.localStorage.setItem(USER_SALT_LOCAL_STORAGE_KEY, salt);
-                setUserSalt(salt);
-              }}
-            >
-              Generate User Salt
-            </Button>
-            <Button
-              variant="contained"
-              disabled={!userSalt}
+              variant="outlined"
               color="error"
+              size="small"
               onClick={() => {
-                const salt = generateRandomness();
-                setUserSalt(salt);
-                window.localStorage.removeItem(USER_SALT_LOCAL_STORAGE_KEY);
-                setUserSalt(undefined);
+                resetLocalState();
               }}
             >
-              Delete User Salt
+              Reset
             </Button>
           </Stack>
           <Typography>
-            User Salt: {userSalt && <code>{userSalt}</code>}
+            <code>
+              {`Private Key ${JSON.stringify(ephemeralKeyPair?.export())}`}
+            </code>
+          </Typography>
+          <Typography>
+            <code>
+              {`Public Key: ${JSON.stringify(
+                ephemeralKeyPair?.getPublicKey().toBase64()
+              )}`}
+            </code>
+          </Typography>
+          <Typography>
+            <code>{`Current Epoch: ${currentEpoch}`}</code>
+          </Typography>
+          <Typography>
+            <code>{`Randomness: ${randomness}`}</code>
+          </Typography>
+          <Typography>
+            <code>{`Nonce: ${nonce}`}</code>
+          </Typography>
+          <Typography>
+            <code>{`Salt: ${userSalt}`}</code>
+          </Typography>
+          <Typography>
+            <code>{`ID Token: ${idToken}`}</code>
+          </Typography>
+          <Typography>
+            <code>{`User SUI Address: ${zkLoginUserAddress}`}</code>
+          </Typography>
+          <Typography>
+            <code>{`extendedEphemeralPublicKey ${extendedEphemeralPublicKey}`}</code>
           </Typography>
         </Stack>
 
-        {/* Step 5 */}
-
         <Stack spacing={2}>
-          <Typography
-            sx={{
-              fontSize: "1.25rem",
-              fontWeight: 600,
-              mb: "12px !important",
-            }}
-          >
-            {t("2fb333f5")}
-          </Typography>
-          <Box>
-            <Button
-              variant="contained"
-              disabled={!userSalt || !jwtString || Boolean(zkLoginUserAddress)}
-              onClick={() => {
-                if (!userSalt) {
-                  return;
-                }
-                const zkLoginUserAddress = jwtToAddress(jwtString, userSalt);
-                setZkLoginUserAddress(zkLoginUserAddress);
-              }}
-            >
-              {t("c9bbf457")}
-            </Button>
-          </Box>
-          <Typography
-            sx={{
-              display: "flex",
-              alignItems: "center",
-            }}
-          >
-            User Sui Address:{" "}
-            {zkLoginUserAddress && (
-              <code>
-                <Typography
-                  component="span"
-                  sx={{
-                    fontFamily: "'Noto Sans Mono', monospace;",
-                    fontWeight: 600,
-                  }}
-                >
-                  {zkLoginUserAddress}
-                </Typography>
-              </code>
-            )}
-            <LoadingButton
-              variant="contained"
-              sx={{
-                ml: "24px",
-              }}
-              size="small"
-              loading={requestingFaucet}
-              disabled={!zkLoginUserAddress}
-              onClick={requestFaucet}
-            >
-              Request Test SUI Token
-            </LoadingButton>
-          </Typography>
-          {zkLoginUserAddress && (
-            <Alert severity="success">
-              Congratulations! At this stage, your Sui zkLogin address has been
-              successfully generated.
-              <br />
-              You can click the button on the right of the address to claim a
-              test SUI Coin.
-              <br />
-              If there's an error with the service, you can use the{" "}
-              <b>devnet faucet</b>{" "}
-              <a
-                href="https://discord.com/channels/916379725201563759/971488439931392130"
-                target="_blank"
-              >
-                (#Sui official discord)
-              </a>{" "}
-              to claim test Sui Token in order to proceed to the next step.
-            </Alert>
-          )}
-        </Stack>
-
-        {/* Step 6 */}
-
-        <Stack spacing={2}>
-          <Typography
-            sx={{
-              fontSize: "1.25rem",
-              fontWeight: 600,
-              mb: "12px !important",
-            }}
-          >
-            {t("51e8ceeb")}
-          </Typography>
-          <Typography>{t("446760ac")}</Typography>
-          <Typography>{t("c5c9e603")}</Typography>
-          <Box>
-            <Button
-              variant="contained"
-              onClick={() => {
-                if (!ephemeralKeyPair) {
-                  return;
-                }
-                const extendedEphemeralPublicKey =
-                  getExtendedEphemeralPublicKey(
-                    ephemeralKeyPair.getPublicKey()
-                  );
-
-                setExtendedEphemeralPublicKey(extendedEphemeralPublicKey);
-              }}
-            >
-              {t("71c429d2")}
-            </Button>
-            <Typography
-              sx={{
-                mt: "12px",
-              }}
-            >
-              extendedEphemeralPublicKey:
-              {extendedEphemeralPublicKey && (
-                <code>{extendedEphemeralPublicKey}</code>
-              )}
-            </Typography>
-          </Box>
-          <Typography>{t(`16ebd660`)}</Typography>
           <LoadingButton
-            loading={fetchingZKProof}
             variant="contained"
-            disabled={
-              !idToken ||
-              !extendedEphemeralPublicKey ||
-              !maxEpoch ||
-              !randomness ||
-              !userSalt
-            }
-            onClick={async () => {
-              try {
-                setFetchingZKProof(true);
-                const zkProofResult = await axios.post(
-                  SUI_PROVER_DEV_ENDPOINT,
-                  {
-                    jwt: idToken as string,
-                    extendedEphemeralPublicKey: extendedEphemeralPublicKey,
-                    maxEpoch: maxEpoch,
-                    jwtRandomness: randomness,
-                    salt: userSalt,
-                    keyClaimName: "sub",
-                  },
-                  {
-                    headers: {
-                      "Content-Type": "application/json",
-                    },
-                  }
-                );
-                setZkProof(zkProofResult.data as PartialZkLoginSignature);
-                enqueueSnackbar("Successfully obtain ZK Proof", {
-                  variant: "success",
-                });
-                // eslint-disable-next-line @typescript-eslint/no-explicit-any
-              } catch (error: any) {
-                console.error(error);
-                enqueueSnackbar(
-                  String(error?.response?.data?.message || error),
-                  {
-                    variant: "error",
-                  }
-                );
-              } finally {
-                setFetchingZKProof(false);
-              }
+            sx={{
+              ml: "24px",
             }}
+            size="small"
+            loading={requestingFaucet}
+            disabled={!zkLoginUserAddress}
+            onClick={requestFaucet}
           >
-            {t("33893c96")}
+            Request Test SUI Token
           </LoadingButton>
         </Stack>
-
-        {/* Step 7 */}
-
         <Box>
-          <Typography
-            sx={{
-              fontSize: "1.25rem",
-              fontWeight: 600,
-              mb: "12px !important",
-            }}
-          >
-            {t("acf1b947")}
-          </Typography>
-          <Alert severity="warning">{t("d58c9e1e")}</Alert>
-          <Typography sx={{ mt: "12px" }}>{t("6591b962")}</Typography>
           <div className="card">
             <LoadingButton
               loading={executingTxn}
