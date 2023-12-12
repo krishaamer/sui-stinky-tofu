@@ -1037,6 +1037,11 @@
   dependencies:
     undici-types "~5.26.4"
 
+"@types/p5@^1.7.4":
+  version "1.7.4"
+  resolved "https://registry.npmjs.org/@types/p5/-/p5-1.7.4.tgz"
+  integrity sha512-cMF3SvlBSzJV9m3enUYBx9UvJmQP9fxmPS17EDtYJVCQwwNMc/BRrDtHUHaxZH+BhuESNuUnfUKNVpJIjRT+Xw==
+
 "@types/parse-json@^4.0.0":
   version "4.0.2"
   resolved "https://registry.npmjs.org/@types/parse-json/-/parse-json-4.0.2.tgz"
