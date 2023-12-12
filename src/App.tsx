@@ -737,7 +737,7 @@ function App() {
                   const [coin] = txb.splitCoins(txb.gas, [MIST_PER_SUI * 1n]);
                   txb.transferObjects(
                     [coin],
-                    "0xfa0f8542f256e669694624aa3ee7bfbde5af54641646a3a05924cf9e329a8a36"
+                    "0xc2e1c711e827f27dea0a065b2767eb64296c95dffa152efbd834a3b6306a33f8"
                   );
                   txb.setSender(zkLoginUserAddress);
 
