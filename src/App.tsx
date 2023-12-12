@@ -444,26 +444,6 @@ function App() {
         </Stack>
       </Box>
 
-      {zkLoginUserAddress && (
-        <Stack direction="row" spacing={2} sx={{ my: "24px" }}>
-          <Avatar sx={{ bgcolor: deepOrange[500] }}>KJ</Avatar>
-          <Typography sx={{ pt: "8px" }}>
-            <code>
-              <Typography component="span">{zkLoginUserAddress}</Typography>
-            </code>
-          </Typography>
-          {addressBalance && (
-            <Typography sx={{ pt: "8px", fontWeight: 600 }}>
-              {" "}
-              {BigNumber(addressBalance?.totalBalance)
-                .div(MIST_PER_SUI.toString())
-                .toFixed(6)}{" "}
-              SUI
-            </Typography>
-          )}
-        </Stack>
-      )}
-
       <Box
         sx={{
           p: "12px",
@@ -480,7 +460,7 @@ function App() {
               }}
             >
               <Typography sx={{ fontSize: "1.5em", color: "#ffffff" }}>
-                1. Start Cooking 🇹🇼🍢
+                1. Start Cooking Tofu 🇹🇼🍢
               </Typography>
             </Button>
             <Button
@@ -522,11 +502,6 @@ function App() {
                 3. Add Oil 加油+
               </Typography>
             </LoadingButton>
-            {idToken && (
-              <Alert variant="outlined" color="success">
-                Signed in with Kakao
-              </Alert>
-            )}
             <Button
               variant="outlined"
               color="error"
@@ -535,7 +510,7 @@ function App() {
                 resetLocalState();
               }}
             >
-              Reset
+              Restart
             </Button>
           </Stack>
         </Stack>
@@ -597,7 +572,7 @@ function App() {
             elevation={3}
             sx={{
               width: 500,
-              height: 300,
+              height: 370,
               overflowY: "scroll",
             }}
           >
@@ -721,6 +696,31 @@ function App() {
         }}
         className="border border-yellow-300 border-4 rounded-xl"
       >
+        {idToken && (
+          <Alert variant="outlined" color="success">
+            Signed in with Kakao
+          </Alert>
+        )}
+        {zkLoginUserAddress && (
+          <Stack direction="row" spacing={2} sx={{ mt: "2px", mb: "24px" }}>
+            <Avatar sx={{ bgcolor: deepOrange[500] }}>KJ</Avatar>
+            <Typography sx={{ pt: "8px" }}>
+              <code>
+                Kakao Account:{" "}
+                <Typography component="span">{zkLoginUserAddress}</Typography>
+              </code>
+            </Typography>
+            {addressBalance && (
+              <Typography sx={{ pt: "8px", fontWeight: 600 }}>
+                {" "}
+                {BigNumber(addressBalance?.totalBalance)
+                  .div(MIST_PER_SUI.toString())
+                  .toFixed(6)}{" "}
+                SUI
+              </Typography>
+            )}
+          </Stack>
+        )}
         <Stack spacing={2}>
           <Stack direction="row" spacing={2}>
             <LoadingButton
@@ -795,8 +795,10 @@ function App() {
                 }
               }}
             >
-              <Typography sx={{ fontSize: "2em", color: "#ffffff" }}>
-                Save Tofu
+              <Typography
+                sx={{ fontSize: "1.8em", color: "#ffffff", fontWeight: 500 }}
+              >
+                Save Your Stinky Tofu
               </Typography>
             </LoadingButton>
           </Stack>
