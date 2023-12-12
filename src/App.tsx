@@ -7,8 +7,10 @@ import {
   Typography,
   Paper,
   Avatar,
+  Skeleton,
 } from "@mui/material";
 import { deepOrange } from "@mui/material/colors";
+import PixelatedImage from "./PixelatedImage";
 
 import {
   Timeline,
@@ -133,7 +135,7 @@ function App() {
         const randomNumber = Math.floor(Math.random() * 4) + 1;
         
          setTimeout(() => {
-           setTofuImage(`tofu${randomNumber}.png`);
+           setTofuImage(`tofu${randomNumber}.jpg`);
          }, 2000); 
       } catch (error) {
         console.error("Error fetching image data:", error);
@@ -623,110 +625,118 @@ function App() {
           )}
         </Box>
       </Box>
-      <Paper elevation={1}>
-        <Box>
-          {nonce && tofuImage && (
-            <img
-              src={`/${tofuImage}`}
-              loading="lazy"
-              width="400px"
-              height="400px"
-              className=""
-            />
-          )}
-        </Box>
-      </Paper>
-      <Paper
-        elevation={1}
+      <Stack
+        direction="row"
+        spacing={2}
         sx={{
           mt: 5,
-          width: "50%",
-          height: 700,
-          overflowY: "auto",
         }}
       >
-        <Timeline
+        <Box
           sx={{
-            [`& .${timelineItemClasses.root}:before`]: {
-              flex: 0,
-              padding: 0,
-            },
+            height: 700,
+            width:"50%",
+            overflowY: "auto",
           }}
         >
-          <TimelineItem>
-            <TimelineSeparator>
-              <TimelineDot />
-              <TimelineConnector />
-            </TimelineSeparator>
-            <TimelineContent>
-              {`Private Key ${JSON.stringify(ephemeralKeyPair?.export())}`}
-            </TimelineContent>
-          </TimelineItem>
-          <TimelineItem>
-            <TimelineSeparator>
-              <TimelineDot />
-              <TimelineConnector />
-            </TimelineSeparator>
-            <TimelineContent>
-              {`Public Key: ${JSON.stringify(
-                ephemeralKeyPair?.getPublicKey().toBase64()
-              )}`}
-            </TimelineContent>
-          </TimelineItem>
-          <TimelineItem>
-            <TimelineSeparator>
-              <TimelineDot />
-              <TimelineConnector />
-            </TimelineSeparator>
-            <TimelineContent>{`Current Epoch: ${currentEpoch}`}</TimelineContent>
-          </TimelineItem>
-          <TimelineItem>
-            <TimelineSeparator>
-              <TimelineDot />
-              <TimelineConnector />
-            </TimelineSeparator>
-            <TimelineContent>{`Randomness: ${randomness}`}</TimelineContent>
-          </TimelineItem>
-          <TimelineItem>
-            <TimelineSeparator>
-              <TimelineDot />
-              <TimelineConnector />
-            </TimelineSeparator>
-            <TimelineContent>{`Nonce: ${nonce}`}</TimelineContent>
-          </TimelineItem>
-          <TimelineItem>
-            <TimelineSeparator>
-              <TimelineDot />
-              <TimelineConnector />
-            </TimelineSeparator>
-            <TimelineContent>{`Salt: ${userSalt}`}</TimelineContent>
-          </TimelineItem>
-          <TimelineItem>
-            <TimelineSeparator>
-              <TimelineDot />
-              <TimelineConnector />
-            </TimelineSeparator>
-            <TimelineContent>{`ID Token: ${idToken}`}</TimelineContent>
-          </TimelineItem>
-          <TimelineItem>
-            <TimelineSeparator>
-              <TimelineDot />
-              <TimelineConnector />
-            </TimelineSeparator>
-            <TimelineContent>
-              {`User SUI Address: ${zkLoginUserAddress}`}
-            </TimelineContent>
-          </TimelineItem>
-          <TimelineItem>
-            <TimelineSeparator>
-              <TimelineDot />
-            </TimelineSeparator>
-            <TimelineContent>
-              {`extendedEphemeralPublicKey ${extendedEphemeralPublicKey}`}
-            </TimelineContent>
-          </TimelineItem>
-        </Timeline>
-      </Paper>
+          {tofuImage ? (
+            <PixelatedImage src={`/${tofuImage}`} loadingTime={5000} />
+          ) : (
+            <Skeleton variant="rectangular" width={400} height={400} />
+          )}
+        </Box>
+
+        <Paper
+          elevation={1}
+          sx={{
+            mt: 5,
+            height: 700,
+            overflowY: "auto",
+          }}
+        >
+          <Timeline
+            sx={{
+              [`& .${timelineItemClasses.root}:before`]: {
+                flex: 0,
+                padding: 0,
+              },
+            }}
+          >
+            <TimelineItem>
+              <TimelineSeparator>
+                <TimelineDot />
+                <TimelineConnector />
+              </TimelineSeparator>
+              <TimelineContent>
+                {`Private Key ${JSON.stringify(ephemeralKeyPair?.export())}`}
+              </TimelineContent>
+            </TimelineItem>
+            <TimelineItem>
+              <TimelineSeparator>
+                <TimelineDot />
+                <TimelineConnector />
+              </TimelineSeparator>
+              <TimelineContent>
+                {`Public Key: ${JSON.stringify(
+                  ephemeralKeyPair?.getPublicKey().toBase64()
+                )}`}
+              </TimelineContent>
+            </TimelineItem>
+            <TimelineItem>
+              <TimelineSeparator>
+                <TimelineDot />
+                <TimelineConnector />
+              </TimelineSeparator>
+              <TimelineContent>{`Current Epoch: ${currentEpoch}`}</TimelineContent>
+            </TimelineItem>
+            <TimelineItem>
+              <TimelineSeparator>
+                <TimelineDot />
+                <TimelineConnector />
+              </TimelineSeparator>
+              <TimelineContent>{`Randomness: ${randomness}`}</TimelineContent>
+            </TimelineItem>
+            <TimelineItem>
+              <TimelineSeparator>
+                <TimelineDot />
+                <TimelineConnector />
+              </TimelineSeparator>
+              <TimelineContent>{`Nonce: ${nonce}`}</TimelineContent>
+            </TimelineItem>
+            <TimelineItem>
+              <TimelineSeparator>
+                <TimelineDot />
+                <TimelineConnector />
+              </TimelineSeparator>
+              <TimelineContent>{`Salt: ${userSalt}`}</TimelineContent>
+            </TimelineItem>
+            <TimelineItem>
+              <TimelineSeparator>
+                <TimelineDot />
+                <TimelineConnector />
+              </TimelineSeparator>
+              <TimelineContent>{`ID Token: ${idToken}`}</TimelineContent>
+            </TimelineItem>
+            <TimelineItem>
+              <TimelineSeparator>
+                <TimelineDot />
+                <TimelineConnector />
+              </TimelineSeparator>
+              <TimelineContent>
+                {`User SUI Address: ${zkLoginUserAddress}`}
+              </TimelineContent>
+            </TimelineItem>
+            <TimelineItem>
+              <TimelineSeparator>
+                <TimelineDot />
+              </TimelineSeparator>
+              <TimelineContent>
+                {`extendedEphemeralPublicKey ${extendedEphemeralPublicKey}`}
+              </TimelineContent>
+            </TimelineItem>
+          </Timeline>
+        </Paper>
+      </Stack>
     </Box>
   );
 }
