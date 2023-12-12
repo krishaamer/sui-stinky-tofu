@@ -13,5 +13,6 @@ I present a design fiction about a possible future where the Taiwanese governmen
 - Vite
 - TailwindCSS
 - MUI
+- Kakao APIs
 - Midjourney
 - ...
