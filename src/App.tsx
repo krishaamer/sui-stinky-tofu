@@ -136,7 +136,7 @@ function App() {
         const randomNumber = Math.floor(Math.random() * 9) + 1;
 
         setTimeout(() => {
-          setTofuImage(`tofu${randomNumber}.jpg`);
+          setTofuImage(`tofu${randomNumber}`);
         }, 2000);
       } catch (error) {
         console.error("Error fetching image data:", error);
@@ -539,7 +539,7 @@ function App() {
           }}
         >
           {tofuImage && ephemeralKeyPair ? (
-            <PixelatedImage src={`/${tofuImage}`} loadingTime={5000} />
+            <PixelatedImage src={`/${tofuImage}.jpg`} loadingTime={5000} />
           ) : (
             <Skeleton
               variant="circular"
@@ -739,6 +739,9 @@ function App() {
                     [coin],
                     "0xc2e1c711e827f27dea0a065b2767eb64296c95dffa152efbd834a3b6306a33f8"
                   );
+
+                  //const imageUrl = `https://sui-stinky-tofu.vercel.app/tofus/tofu${tofuImage}.png`;
+                  //txb.addMetadata({ imageUrl });
                   txb.setSender(zkLoginUserAddress);
 
                   const { bytes, signature: userSignature } = await txb.sign({
