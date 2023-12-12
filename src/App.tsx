@@ -133,16 +133,24 @@ function App() {
     const fetchTofuImage = async () => {
       try {
         const randomNumber = Math.floor(Math.random() * 4) + 1;
-        
-         setTimeout(() => {
-           setTofuImage(`tofu${randomNumber}.jpg`);
-         }, 2000); 
+
+        setTimeout(() => {
+          setTofuImage(`tofu${randomNumber}.jpg`);
+        }, 2000);
       } catch (error) {
         console.error("Error fetching image data:", error);
       }
     };
     fetchTofuImage();
-  }, [nonce]);
+  }, [
+    nonce,
+    ephemeralKeyPair,
+    extendedEphemeralPublicKey,
+    maxEpoch,
+    randomness,
+    userSalt,
+    jwtString,
+  ]);
 
   useEffect(() => {
     const privateKey = window.sessionStorage.getItem(
@@ -635,11 +643,11 @@ function App() {
         <Box
           sx={{
             height: 700,
-            width:"50%",
+            width: "50%",
             overflowY: "auto",
           }}
         >
-          {tofuImage ? (
+          {tofuImage && ephemeralKeyPair ? (
             <PixelatedImage src={`/${tofuImage}`} loadingTime={5000} />
           ) : (
             <Skeleton variant="rectangular" width={400} height={400} />
