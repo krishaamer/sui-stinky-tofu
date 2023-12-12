@@ -132,7 +132,7 @@ function App() {
   useEffect(() => {
     const fetchTofuImage = async () => {
       try {
-        const randomNumber = Math.floor(Math.random() * 4) + 1;
+        const randomNumber = Math.floor(Math.random() * 9) + 1;
 
         setTimeout(() => {
           setTofuImage(`tofu${randomNumber}.jpg`);
