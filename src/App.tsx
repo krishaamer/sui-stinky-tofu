@@ -798,7 +798,7 @@ function App() {
               <Typography
                 sx={{ fontSize: "1.8em", color: "#ffffff", fontWeight: 500 }}
               >
-                Save Your Stinky Tofu
+                Buy This Stinky Tofu
               </Typography>
             </LoadingButton>
           </Stack>
