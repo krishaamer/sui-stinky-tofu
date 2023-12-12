@@ -257,6 +257,7 @@ function App() {
           });
         } catch (error) {
           console.error(error);
+          // @ts-ignore
           enqueueSnackbar(String(error?.response?.data?.message || error), {
             variant: "error",
           });
