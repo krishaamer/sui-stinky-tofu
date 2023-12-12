@@ -461,11 +461,6 @@ function App() {
               SUI
             </Typography>
           )}
-          {idToken && (
-            <Alert variant="outlined" color="success">
-              Signed in with Kakao
-            </Alert>
-          )}
         </Stack>
       )}
 
@@ -527,82 +522,11 @@ function App() {
                 3. Add Oil 加油+
               </Typography>
             </LoadingButton>
-            <LoadingButton
-              size="large"
-              loading={executingTxn}
-              variant="contained"
-              disabled={!decodedJwt}
-              onClick={async () => {
-                try {
-                  if (
-                    !ephemeralKeyPair ||
-                    !zkProof ||
-                    !decodedJwt ||
-                    !userSalt
-                  ) {
-                    return;
-                  }
-                  setExecutingTxn(true);
-                  const txb = new TransactionBlock();
-
-                  const [coin] = txb.splitCoins(txb.gas, [MIST_PER_SUI * 1n]);
-                  txb.transferObjects(
-                    [coin],
-                    "0xfa0f8542f256e669694624aa3ee7bfbde5af54641646a3a05924cf9e329a8a36"
-                  );
-                  txb.setSender(zkLoginUserAddress);
-
-                  const { bytes, signature: userSignature } = await txb.sign({
-                    client: suiClient,
-                    signer: ephemeralKeyPair, // This must be the same ephemeral key pair used in the ZKP request
-                  });
-                  if (!decodedJwt?.sub || !decodedJwt.aud) {
-                    return;
-                  }
-
-                  const addressSeed: string = genAddressSeed(
-                    BigInt(userSalt),
-                    "sub",
-                    decodedJwt.sub,
-                    decodedJwt.aud as string
-                  ).toString();
-
-                  const zkLoginSignature: SerializedSignature =
-                    getZkLoginSignature({
-                      inputs: {
-                        ...zkProof,
-                        addressSeed,
-                      },
-                      maxEpoch,
-                      userSignature,
-                    });
-
-                  const executeRes = await suiClient.executeTransactionBlock({
-                    transactionBlock: bytes,
-                    signature: zkLoginSignature,
-                  });
-
-                  enqueueSnackbar(
-                    `Execution successful: ${executeRes.digest}`,
-                    {
-                      variant: "success",
-                    }
-                  );
-                  setExecuteDigest(executeRes.digest);
-                } catch (error) {
-                  console.error(error);
-                  enqueueSnackbar(String(error), {
-                    variant: "error",
-                  });
-                } finally {
-                  setExecutingTxn(false);
-                }
-              }}
-            >
-              <Typography sx={{ fontSize: "1.5em", color: "#ffffff" }}>
-                4. Save Tofu
-              </Typography>
-            </LoadingButton>
+            {idToken && (
+              <Alert variant="outlined" color="success">
+                Signed in with Kakao
+              </Alert>
+            )}
             <Button
               variant="outlined"
               color="error"
@@ -618,7 +542,7 @@ function App() {
         <Box>
           {executeDigest && (
             <Alert severity="success" sx={{ mt: "12px" }}>
-              Execution successful:{" "}
+              Stinky Tofu Saved!{" "}
               <Typography component="span">
                 <a
                   href={`https://suiexplorer.com/txblock/${executeDigest}?network=devnet`}
@@ -635,12 +559,13 @@ function App() {
         direction="row"
         spacing={2}
         sx={{
-          mt: 5,
+          my: 5,
         }}
       >
         <Box
           sx={{
-            height: 700,
+            minHeight: 400,
+            height: "100%",
             width: "100%",
             overflowY: "auto",
           }}
@@ -649,10 +574,10 @@ function App() {
             <PixelatedImage src={`/${tofuImage}`} loadingTime={5000} />
           ) : (
             <Skeleton
-              variant="rounded"
+              variant="circular"
               width={400}
               height={400}
-              sx={{ bgcolor: "#d58a3c" }}
+              sx={{ bgcolor: "#fee52c" }}
             />
           )}
         </Box>
@@ -666,14 +591,14 @@ function App() {
               columnGap: "16px",
             }}
           >
-            Stinky Tofu Logs
+            Tofu Logs
           </Typography>
           <Paper
-            elevation={1}
+            elevation={3}
             sx={{
               width: 500,
-              height: 700,
-              overflowY: "auto",
+              height: 300,
+              overflowY: "scroll",
             }}
           >
             <Timeline
@@ -790,6 +715,108 @@ function App() {
           </Paper>
         </Box>
       </Stack>
+      <Box
+        sx={{
+          p: "12px",
+        }}
+        className="border border-yellow-300 border-4 rounded-xl"
+      >
+        <Stack spacing={2}>
+          <Stack direction="row" spacing={2}>
+            <LoadingButton
+              size="large"
+              loading={executingTxn}
+              variant="contained"
+              disabled={!decodedJwt}
+              onClick={async () => {
+                try {
+                  if (
+                    !ephemeralKeyPair ||
+                    !zkProof ||
+                    !decodedJwt ||
+                    !userSalt
+                  ) {
+                    return;
+                  }
+                  setExecutingTxn(true);
+                  const txb = new TransactionBlock();
+
+                  const [coin] = txb.splitCoins(txb.gas, [MIST_PER_SUI * 1n]);
+                  txb.transferObjects(
+                    [coin],
+                    "0xfa0f8542f256e669694624aa3ee7bfbde5af54641646a3a05924cf9e329a8a36"
+                  );
+                  txb.setSender(zkLoginUserAddress);
+
+                  const { bytes, signature: userSignature } = await txb.sign({
+                    client: suiClient,
+                    signer: ephemeralKeyPair, // This must be the same ephemeral key pair used in the ZKP request
+                  });
+                  if (!decodedJwt?.sub || !decodedJwt.aud) {
+                    return;
+                  }
+
+                  const addressSeed: string = genAddressSeed(
+                    BigInt(userSalt),
+                    "sub",
+                    decodedJwt.sub,
+                    decodedJwt.aud as string
+                  ).toString();
+
+                  const zkLoginSignature: SerializedSignature =
+                    getZkLoginSignature({
+                      inputs: {
+                        ...zkProof,
+                        addressSeed,
+                      },
+                      maxEpoch,
+                      userSignature,
+                    });
+
+                  const executeRes = await suiClient.executeTransactionBlock({
+                    transactionBlock: bytes,
+                    signature: zkLoginSignature,
+                  });
+
+                  enqueueSnackbar(
+                    `Execution successful: ${executeRes.digest}`,
+                    {
+                      variant: "success",
+                    }
+                  );
+                  setExecuteDigest(executeRes.digest);
+                } catch (error) {
+                  console.error(error);
+                  enqueueSnackbar(String(error), {
+                    variant: "error",
+                  });
+                } finally {
+                  setExecutingTxn(false);
+                }
+              }}
+            >
+              <Typography sx={{ fontSize: "2em", color: "#ffffff" }}>
+                Save Tofu
+              </Typography>
+            </LoadingButton>
+          </Stack>
+        </Stack>
+        <Box>
+          {executeDigest && (
+            <Alert severity="success" sx={{ mt: "12px" }}>
+              Execution successful:{" "}
+              <Typography component="span">
+                <a
+                  href={`https://suiexplorer.com/txblock/${executeDigest}?network=devnet`}
+                  target="_blank"
+                >
+                  {executeDigest}
+                </a>
+              </Typography>
+            </Alert>
+          )}
+        </Box>
+      </Box>
     </Box>
   );
 }
