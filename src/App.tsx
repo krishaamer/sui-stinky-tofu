@@ -1,5 +1,27 @@
 import { LoadingButton } from "@mui/lab";
-import { Alert, Box, Button, Stack, Typography } from "@mui/material";
+import {
+  Alert,
+  Box,
+  Button,
+  Stack,
+  Typography,
+  Paper,
+  Avatar,
+  Skeleton,
+} from "@mui/material";
+import { deepOrange } from "@mui/material/colors";
+import PixelatedImage from "./PixelatedImage";
+
+import {
+  Timeline,
+  TimelineItem,
+  TimelineSeparator,
+  TimelineConnector,
+  TimelineContent,
+  TimelineDot,
+  timelineItemClasses,
+} from "@mui/lab";
+
 import { fromB64 } from "@mysten/bcs";
 import { useSuiClientQuery } from "@mysten/dapp-kit";
 import { SuiClient } from "@mysten/sui.js/client";
@@ -21,7 +43,6 @@ import { JwtPayload, jwtDecode } from "jwt-decode";
 import { enqueueSnackbar } from "notistack";
 import queryString from "query-string";
 import { useEffect, useState } from "react";
-import { Trans, useTranslation } from "react-i18next";
 import { useLocation, useNavigate } from "react-router-dom";
 import "./App.css";
 import KakaoLogo from "./assets/kakao.png";
@@ -45,7 +66,7 @@ export type PartialZkLoginSignature = Omit<
 const suiClient = new SuiClient({ url: FULLNODE_URL });
 
 function App() {
-  const { t, i18n } = useTranslation();
+  const [tofuImage, setTofuImage] = useState("");
   const [currentEpoch, setCurrentEpoch] = useState("");
   const [nonce, setNonce] = useState("");
   const [oauthParams, setOauthParams] =
@@ -102,12 +123,26 @@ function App() {
         setMaxEpoch(Number(epoch) + 10);
       } catch (error) {
         console.error("Error fetching epoch data:", error);
-        // Handle errors appropriately
       }
     };
 
     fetchEpochData();
   }, [randomness]);
+
+  useEffect(() => {
+    const fetchTofuImage = async () => {
+      try {
+        const randomNumber = Math.floor(Math.random() * 4) + 1;
+        
+         setTimeout(() => {
+           setTofuImage(`tofu${randomNumber}.jpg`);
+         }, 2000); 
+      } catch (error) {
+        console.error("Error fetching image data:", error);
+      }
+    };
+    fetchTofuImage();
+  }, [nonce]);
 
   useEffect(() => {
     const privateKey = window.sessionStorage.getItem(
@@ -185,7 +220,6 @@ function App() {
   }, [jwtString, userSalt]);
 
   useEffect(() => {
-
     if (userSalt && jwtString) {
       const fetchZKProof = async () => {
         try {
@@ -210,7 +244,6 @@ function App() {
           enqueueSnackbar("Successfully obtain ZK Proof", {
             variant: "success",
           });
-          // eslint-disable-next-line @typescript-eslint/no-explicit-any
         } catch (error: any) {
           console.error(error);
           enqueueSnackbar(String(error?.response?.data?.message || error), {
@@ -223,7 +256,6 @@ function App() {
 
       fetchZKProof();
     }
-
   }, [
     idToken,
     extendedEphemeralPublicKey,
@@ -267,6 +299,7 @@ function App() {
   const resetState = () => {
     setCurrentEpoch("");
     setNonce("");
+    setTofuImage("");
     setIdToken("");
     setOauthParams(undefined);
     setZkLoginUserAddress("");
@@ -377,21 +410,35 @@ function App() {
         >
           <Typography
             sx={{
-              fontSize: "2rem",
+              fontSize: "2em",
               fontWeight: 600,
               display: "flex",
               alignItems: "center",
               columnGap: "16px",
             }}
           >
-            SUI ZIRAN{" "}
+            SUI Stinky Tofu Kiosk
+          </Typography>
+          <Typography
+            sx={{
+              fontSize: "1.5em",
+              fontWeight: 500,
+              display: "flex",
+              alignItems: "center",
+              columnGap: "16px",
+            }}
+          >
+            The government of Taiwan 🇹🇼 has decided to gift the Korean 🇰🇷 people
+            10 million SUI worth of stinky tofu. Use your Kakao account to
+            redeem your free stinky tofu.
           </Typography>
         </Stack>
       </Box>
 
       {zkLoginUserAddress && (
-        <Stack direction="row" spacing={1} sx={{ mt: "24px" }}>
-          <Typography>
+        <Stack direction="row" spacing={2} sx={{ my: "24px" }}>
+          <Avatar sx={{ bgcolor: deepOrange[500] }}>KJ</Avatar>
+          <Typography sx={{ pt: "8px" }}>
             <code>
               <Typography
                 component="span"
@@ -405,20 +452,24 @@ function App() {
             </code>
           </Typography>
           {addressBalance && (
-            <Typography>
-              Balance:{" "}
+            <Typography sx={{ pt: "8px", fontWeight: 600 }}>
+              {" "}
               {BigNumber(addressBalance?.totalBalance)
                 .div(MIST_PER_SUI.toString())
                 .toFixed(6)}{" "}
               SUI
             </Typography>
           )}
+          {idToken && (
+            <Alert variant="outlined" color="success">
+              Signed in with Kakao
+            </Alert>
+          )}
         </Stack>
       )}
 
       <Box
         sx={{
-          mt: "24px",
           p: "12px",
         }}
         className="border border-slate-300 rounded-xl"
@@ -431,7 +482,7 @@ function App() {
                 doCryptoStuff();
               }}
             >
-              Start Cooking 🇹🇼🍢
+              1. Start Cooking 🇹🇼🍢
             </Button>
             <Button
               disabled={!nonce}
@@ -456,13 +507,8 @@ function App() {
                 }}
                 alt="Kakao"
               />{" "}
-              Sign In With Kakao
+              2. Sign In With Kakao
             </Button>
-            {idToken && (
-              <Alert variant="outlined" color="success">
-                Logged in via Kakao!
-              </Alert>
-            )}
             <LoadingButton
               variant="contained"
               size="medium"
@@ -470,7 +516,7 @@ function App() {
               disabled={!zkLoginUserAddress}
               onClick={requestFaucet}
             >
-              +Add Oil 加油 🧈
+              3. Add Oil 加油+
             </LoadingButton>
             <LoadingButton
               loading={executingTxn}
@@ -543,7 +589,7 @@ function App() {
                 }
               }}
             >
-              Save
+              4. Save Tofu
             </LoadingButton>
             <Button
               variant="outlined"
@@ -556,39 +602,6 @@ function App() {
               Reset
             </Button>
           </Stack>
-          <Typography>
-            <code>
-              {`Private Key ${JSON.stringify(ephemeralKeyPair?.export())}`}
-            </code>
-          </Typography>
-          <Typography>
-            <code>
-              {`Public Key: ${JSON.stringify(
-                ephemeralKeyPair?.getPublicKey().toBase64()
-              )}`}
-            </code>
-          </Typography>
-          <Typography>
-            <code>{`Current Epoch: ${currentEpoch}`}</code>
-          </Typography>
-          <Typography>
-            <code>{`Randomness: ${randomness}`}</code>
-          </Typography>
-          <Typography>
-            <code>{`Nonce: ${nonce}`}</code>
-          </Typography>
-          <Typography>
-            <code>{`Salt: ${userSalt}`}</code>
-          </Typography>
-          <Typography>
-            <code>{`ID Token: ${idToken}`}</code>
-          </Typography>
-          <Typography>
-            <code>{`User SUI Address: ${zkLoginUserAddress}`}</code>
-          </Typography>
-          <Typography>
-            <code>{`extendedEphemeralPublicKey ${extendedEphemeralPublicKey}`}</code>
-          </Typography>
         </Stack>
         <Box>
           {executeDigest && (
@@ -612,6 +625,118 @@ function App() {
           )}
         </Box>
       </Box>
+      <Stack
+        direction="row"
+        spacing={2}
+        sx={{
+          mt: 5,
+        }}
+      >
+        <Box
+          sx={{
+            height: 700,
+            width:"50%",
+            overflowY: "auto",
+          }}
+        >
+          {tofuImage ? (
+            <PixelatedImage src={`/${tofuImage}`} loadingTime={5000} />
+          ) : (
+            <Skeleton variant="rectangular" width={400} height={400} />
+          )}
+        </Box>
+
+        <Paper
+          elevation={1}
+          sx={{
+            mt: 5,
+            height: 700,
+            overflowY: "auto",
+          }}
+        >
+          <Timeline
+            sx={{
+              [`& .${timelineItemClasses.root}:before`]: {
+                flex: 0,
+                padding: 0,
+              },
+            }}
+          >
+            <TimelineItem>
+              <TimelineSeparator>
+                <TimelineDot />
+                <TimelineConnector />
+              </TimelineSeparator>
+              <TimelineContent>
+                {`Private Key ${JSON.stringify(ephemeralKeyPair?.export())}`}
+              </TimelineContent>
+            </TimelineItem>
+            <TimelineItem>
+              <TimelineSeparator>
+                <TimelineDot />
+                <TimelineConnector />
+              </TimelineSeparator>
+              <TimelineContent>
+                {`Public Key: ${JSON.stringify(
+                  ephemeralKeyPair?.getPublicKey().toBase64()
+                )}`}
+              </TimelineContent>
+            </TimelineItem>
+            <TimelineItem>
+              <TimelineSeparator>
+                <TimelineDot />
+                <TimelineConnector />
+              </TimelineSeparator>
+              <TimelineContent>{`Current Epoch: ${currentEpoch}`}</TimelineContent>
+            </TimelineItem>
+            <TimelineItem>
+              <TimelineSeparator>
+                <TimelineDot />
+                <TimelineConnector />
+              </TimelineSeparator>
+              <TimelineContent>{`Randomness: ${randomness}`}</TimelineContent>
+            </TimelineItem>
+            <TimelineItem>
+              <TimelineSeparator>
+                <TimelineDot />
+                <TimelineConnector />
+              </TimelineSeparator>
+              <TimelineContent>{`Nonce: ${nonce}`}</TimelineContent>
+            </TimelineItem>
+            <TimelineItem>
+              <TimelineSeparator>
+                <TimelineDot />
+                <TimelineConnector />
+              </TimelineSeparator>
+              <TimelineContent>{`Salt: ${userSalt}`}</TimelineContent>
+            </TimelineItem>
+            <TimelineItem>
+              <TimelineSeparator>
+                <TimelineDot />
+                <TimelineConnector />
+              </TimelineSeparator>
+              <TimelineContent>{`ID Token: ${idToken}`}</TimelineContent>
+            </TimelineItem>
+            <TimelineItem>
+              <TimelineSeparator>
+                <TimelineDot />
+                <TimelineConnector />
+              </TimelineSeparator>
+              <TimelineContent>
+                {`User SUI Address: ${zkLoginUserAddress}`}
+              </TimelineContent>
+            </TimelineItem>
+            <TimelineItem>
+              <TimelineSeparator>
+                <TimelineDot />
+              </TimelineSeparator>
+              <TimelineContent>
+                {`extendedEphemeralPublicKey ${extendedEphemeralPublicKey}`}
+              </TimelineContent>
+            </TimelineItem>
+          </Timeline>
+        </Paper>
+      </Stack>
     </Box>
   );
 }
