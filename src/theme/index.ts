@@ -1,7 +1,7 @@
 import { ThemeOptions } from '@mui/material';
 import { gray } from './colors/index';
 
-const fontFamily = `"Montserrat", sans-serif`;
+const fontFamily = `"Sniglet", sans-serif`;
 const ThemeConfig = {
   palette: {
     mode: 'light',
