@@ -431,7 +431,7 @@ function App() {
               color: "#d58a3c",
             }}
           >
-            SUI Stinky Tofu Kiosk
+            SUI Stinky Tofu 🇹🇼🇰🇷
           </Typography>
           <img src="/tofu-logo.png" height={200} width={200} />
           <Typography
@@ -445,7 +445,9 @@ function App() {
           >
             The government of Taiwan has decided to gift the Korean people 10
             million SUI worth of stinky tofu. Use your Kakao account to redeem
-            your free stinky tofu 🇹🇼🇰🇷
+            your free stinky tofu 대만 정부는 한국인에게 10백만 SUI 가치의
+            냄새나는 두부를 선물하기로 결정했습니다. 카카오 계정을 사용하여 무료
+            냄새나는 두부를 받으세요
           </Typography>
         </Stack>
       </Box>
@@ -505,7 +507,7 @@ function App() {
               onClick={requestFaucet}
             >
               <Typography sx={{ fontSize: "1.5em", color: "#ffffff" }}>
-                3. Get Taiwanese SUI 加油+
+                3. Get Taiwanese Money 💰
               </Typography>
             </LoadingButton>
             <Button
@@ -707,7 +709,7 @@ function App() {
                 {BigNumber(addressBalance?.totalBalance)
                   .div(MIST_PER_SUI.toString())
                   .toFixed(6)}{" "}
-                SUI
+                SUI MONEY 💰
               </Typography>
             )}
           </Stack>
@@ -769,12 +771,9 @@ function App() {
                     signature: zkLoginSignature,
                   });
 
-                  enqueueSnackbar(
-                    `Stinky Tofu Saved: ${executeRes.digest}`,
-                    {
-                      variant: "success",
-                    }
-                  );
+                  enqueueSnackbar(`Stinky Tofu Saved: ${executeRes.digest}`, {
+                    variant: "success",
+                  });
                   setExecuteDigest(executeRes.digest);
                 } catch (error) {
                   console.error(error);
@@ -789,7 +788,7 @@ function App() {
               <Typography
                 sx={{ fontSize: "1.8em", color: "#ffffff", fontWeight: 500 }}
               >
-                Buy Stinky Tofu
+                Buy This Stinky Tofu
               </Typography>
             </LoadingButton>
             <Typography
