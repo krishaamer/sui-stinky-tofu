@@ -499,7 +499,7 @@ function App() {
               onClick={requestFaucet}
             >
               <Typography sx={{ fontSize: "1.5em", color: "#ffffff" }}>
-                3. Add Oil 加油+
+                3. Add Taiwanese SUI 加油+
               </Typography>
             </LoadingButton>
             <Button
@@ -801,6 +801,18 @@ function App() {
                 Buy This Stinky Tofu
               </Typography>
             </LoadingButton>
+            <Typography
+              sx={{
+                fontSize: "1.5em",
+                fontWeight: 500,
+                display: "flex",
+                alignItems: "center",
+                color: "#d58a3c",
+              }}
+            >
+              Travel to Taiwan in 2024 to redeem your Digital Stinky Tofu for a
+              Real One. Yummy! 😋
+            </Typography>
           </Stack>
         </Stack>
         <Box>
