@@ -64,15 +64,9 @@ function App() {
   const [fetchingZKProof, setFetchingZKProof] = useState(false);
   const [executingTxn, setExecutingTxn] = useState(false);
   const [executeDigest, setExecuteDigest] = useState("");
-  const [lang, setLang] = useState<"zh" | "en">("en");
 
   const location = useLocation();
   const navigate = useNavigate();
-
-  // Change lng
-  useEffect(() => {
-    i18n.changeLanguage(lang);
-  }, [i18n, lang]);
 
   useEffect(() => {
     const res = queryString.parse(location.hash);
@@ -437,7 +431,7 @@ function App() {
                 doCryptoStuff();
               }}
             >
-              Do Crypto Stuff
+              Start Cooking 🇹🇼🍢
             </Button>
             <Button
               disabled={!nonce}
@@ -476,7 +470,7 @@ function App() {
               disabled={!zkLoginUserAddress}
               onClick={requestFaucet}
             >
-              +Free Gas
+              +Add Oil 加油 🧈
             </LoadingButton>
             <LoadingButton
               loading={executingTxn}
@@ -597,27 +591,25 @@ function App() {
           </Typography>
         </Stack>
         <Box>
-       
-            {executeDigest && (
-              <Alert severity="success" sx={{ mt: "12px" }}>
-                Execution successful:{" "}
-                <Typography
-                  component="span"
-                  sx={{
-                    fontFamily: "'Noto Sans Mono', monospace;",
-                    fontWeight: 600,
-                  }}
+          {executeDigest && (
+            <Alert severity="success" sx={{ mt: "12px" }}>
+              Execution successful:{" "}
+              <Typography
+                component="span"
+                sx={{
+                  fontFamily: "'Noto Sans Mono', monospace;",
+                  fontWeight: 600,
+                }}
+              >
+                <a
+                  href={`https://suiexplorer.com/txblock/${executeDigest}?network=devnet`}
+                  target="_blank"
                 >
-                  <a
-                    href={`https://suiexplorer.com/txblock/${executeDigest}?network=devnet`}
-                    target="_blank"
-                  >
-                    {executeDigest}
-                  </a>
-                </Typography>
-              </Alert>
-            )}
-    
+                  {executeDigest}
+                </a>
+              </Typography>
+            </Alert>
+          )}
         </Box>
       </Box>
     </Box>
