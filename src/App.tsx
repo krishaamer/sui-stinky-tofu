@@ -418,15 +418,15 @@ function App() {
         >
           <Typography
             sx={{
-              fontSize: "2em",
+              fontSize: "2.2em",
               fontWeight: 600,
               display: "flex",
               alignItems: "center",
-              columnGap: "16px",
             }}
           >
             SUI Stinky Tofu Kiosk
           </Typography>
+          <img src="/tofu-logo.png" height={200} width={200} />
           <Typography
             sx={{
               fontSize: "1.5em",
@@ -436,9 +436,9 @@ function App() {
               columnGap: "16px",
             }}
           >
-            The government of Taiwan 🇹🇼 has decided to gift the Korean 🇰🇷 people
-            10 million SUI worth of stinky tofu. Use your Kakao account to
-            redeem your free stinky tofu.
+            The government of Taiwan has decided to gift the Korean people 10
+            million SUI worth of stinky tofu. Use your Kakao account to redeem
+            your free stinky tofu 🇹🇼🇰🇷
           </Typography>
         </Stack>
       </Box>
@@ -448,15 +448,7 @@ function App() {
           <Avatar sx={{ bgcolor: deepOrange[500] }}>KJ</Avatar>
           <Typography sx={{ pt: "8px" }}>
             <code>
-              <Typography
-                component="span"
-                sx={{
-                  fontFamily: "'Noto Sans Mono', monospace;",
-                  fontWeight: 600,
-                }}
-              >
-                {zkLoginUserAddress}
-              </Typography>
+              <Typography component="span">{zkLoginUserAddress}</Typography>
             </code>
           </Typography>
           {addressBalance && (
@@ -615,13 +607,7 @@ function App() {
           {executeDigest && (
             <Alert severity="success" sx={{ mt: "12px" }}>
               Execution successful:{" "}
-              <Typography
-                component="span"
-                sx={{
-                  fontFamily: "'Noto Sans Mono', monospace;",
-                  fontWeight: 600,
-                }}
-              >
+              <Typography component="span">
                 <a
                   href={`https://suiexplorer.com/txblock/${executeDigest}?network=devnet`}
                   target="_blank"
@@ -676,7 +662,9 @@ function App() {
                 <TimelineConnector />
               </TimelineSeparator>
               <TimelineContent>
-                {`Private Key ${JSON.stringify(ephemeralKeyPair?.export())}`}
+                <div style={{ overflowWrap: "anywhere" }}>
+                  {`Private Key ${JSON.stringify(ephemeralKeyPair?.export())}`}
+                </div>
               </TimelineContent>
             </TimelineItem>
             <TimelineItem>
@@ -685,9 +673,11 @@ function App() {
                 <TimelineConnector />
               </TimelineSeparator>
               <TimelineContent>
-                {`Public Key: ${JSON.stringify(
-                  ephemeralKeyPair?.getPublicKey().toBase64()
-                )}`}
+                <div style={{ overflowWrap: "anywhere" }}>
+                  {`Public Key: ${JSON.stringify(
+                    ephemeralKeyPair?.getPublicKey().toBase64()
+                  )}`}
+                </div>
               </TimelineContent>
             </TimelineItem>
             <TimelineItem>
