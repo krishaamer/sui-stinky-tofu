@@ -82,7 +82,7 @@ function App() {
     useState("");
   const [maxEpoch, setMaxEpoch] = useState(0);
   const [randomness, setRandomness] = useState("");
-  const [fetchingZKProof, setFetchingZKProof] = useState(false);
+  //const [fetchingZKProof, setFetchingZKProof] = useState(false);
   const [executingTxn, setExecutingTxn] = useState(false);
   const [executeDigest, setExecuteDigest] = useState("");
 
@@ -231,7 +231,7 @@ function App() {
     if (userSalt && jwtString) {
       const fetchZKProof = async () => {
         try {
-          setFetchingZKProof(true);
+          //setFetchingZKProof(true);
           const zkProofResult = await axios.post(
             SUI_PROVER_DEV_ENDPOINT,
             {
@@ -258,7 +258,7 @@ function App() {
             variant: "error",
           });
         } finally {
-          setFetchingZKProof(false);
+          //setFetchingZKProof(false);
         }
       };
 
@@ -319,7 +319,7 @@ function App() {
     setExtendedEphemeralPublicKey("");
     setMaxEpoch(0);
     setRandomness("");
-    setFetchingZKProof(false);
+    //setFetchingZKProof(false);
     setExecutingTxn(false);
     setExecuteDigest("");
   };
@@ -418,10 +418,11 @@ function App() {
         >
           <Typography
             sx={{
-              fontSize: "2.2em",
+              fontSize: "2.5em",
               fontWeight: 600,
               display: "flex",
               alignItems: "center",
+              color: "#d58a3c",
             }}
           >
             SUI Stinky Tofu Kiosk
@@ -433,7 +434,7 @@ function App() {
               fontWeight: 500,
               display: "flex",
               alignItems: "center",
-              columnGap: "16px",
+              color: "#d58a3c",
             }}
           >
             The government of Taiwan has decided to gift the Korean people 10
@@ -472,20 +473,24 @@ function App() {
         sx={{
           p: "12px",
         }}
-        className="border border-slate-300 rounded-xl"
+        className="border border-yellow-300 border-4 rounded-xl"
       >
         <Stack spacing={2}>
           <Stack direction="row" spacing={2}>
             <Button
+              size="large"
               variant="contained"
               onClick={() => {
                 doCryptoStuff();
               }}
             >
-              1. Start Cooking 🇹🇼🍢
+              <Typography sx={{ fontSize: "1.5em", color: "#ffffff" }}>
+                1. Start Cooking 🇹🇼🍢
+              </Typography>
             </Button>
             <Button
-              disabled={!nonce}
+              size="large"
+              disabled={!nonce || !tofuImage}
               variant="contained"
               onClick={() => {
                 const params = new URLSearchParams({
@@ -507,18 +512,23 @@ function App() {
                 }}
                 alt="Kakao"
               />{" "}
-              2. Sign In With Kakao
+              <Typography sx={{ fontSize: "1.5em", color: "#ffffff" }}>
+                2. Sign In With Kakao
+              </Typography>
             </Button>
             <LoadingButton
+              size="large"
               variant="contained"
-              size="medium"
               loading={requestingFaucet}
               disabled={!zkLoginUserAddress}
               onClick={requestFaucet}
             >
-              3. Add Oil 加油+
+              <Typography sx={{ fontSize: "1.5em", color: "#ffffff" }}>
+                3. Add Oil 加油+
+              </Typography>
             </LoadingButton>
             <LoadingButton
+              size="large"
               loading={executingTxn}
               variant="contained"
               disabled={!decodedJwt}
@@ -589,7 +599,9 @@ function App() {
                 }
               }}
             >
-              4. Save Tofu
+              <Typography sx={{ fontSize: "1.5em", color: "#ffffff" }}>
+                4. Save Tofu
+              </Typography>
             </LoadingButton>
             <Button
               variant="outlined"
@@ -629,111 +641,154 @@ function App() {
         <Box
           sx={{
             height: 700,
-            width: "50%",
+            width: "100%",
             overflowY: "auto",
           }}
         >
           {tofuImage && ephemeralKeyPair ? (
             <PixelatedImage src={`/${tofuImage}`} loadingTime={5000} />
           ) : (
-            <Skeleton variant="rectangular" width={400} height={400} />
+            <Skeleton
+              variant="rounded"
+              width={400}
+              height={400}
+              sx={{ bgcolor: "#d58a3c" }}
+            />
           )}
         </Box>
-
-        <Paper
-          elevation={1}
-          sx={{
-            mt: 5,
-            height: 700,
-            overflowY: "auto",
-          }}
-        >
-          <Timeline
+        <Box>
+          <Typography
             sx={{
-              [`& .${timelineItemClasses.root}:before`]: {
-                flex: 0,
-                padding: 0,
-              },
+              fontSize: "1.5em",
+              fontWeight: 500,
+              display: "flex",
+              alignItems: "center",
+              columnGap: "16px",
             }}
           >
-            <TimelineItem>
-              <TimelineSeparator>
-                <TimelineDot />
-                <TimelineConnector />
-              </TimelineSeparator>
-              <TimelineContent>
-                <div style={{ overflowWrap: "anywhere" }}>
-                  {`Private Key ${JSON.stringify(ephemeralKeyPair?.export())}`}
-                </div>
-              </TimelineContent>
-            </TimelineItem>
-            <TimelineItem>
-              <TimelineSeparator>
-                <TimelineDot />
-                <TimelineConnector />
-              </TimelineSeparator>
-              <TimelineContent>
-                <div style={{ overflowWrap: "anywhere" }}>
-                  {`Public Key: ${JSON.stringify(
-                    ephemeralKeyPair?.getPublicKey().toBase64()
-                  )}`}
-                </div>
-              </TimelineContent>
-            </TimelineItem>
-            <TimelineItem>
-              <TimelineSeparator>
-                <TimelineDot />
-                <TimelineConnector />
-              </TimelineSeparator>
-              <TimelineContent>{`Current Epoch: ${currentEpoch}`}</TimelineContent>
-            </TimelineItem>
-            <TimelineItem>
-              <TimelineSeparator>
-                <TimelineDot />
-                <TimelineConnector />
-              </TimelineSeparator>
-              <TimelineContent>{`Randomness: ${randomness}`}</TimelineContent>
-            </TimelineItem>
-            <TimelineItem>
-              <TimelineSeparator>
-                <TimelineDot />
-                <TimelineConnector />
-              </TimelineSeparator>
-              <TimelineContent>{`Nonce: ${nonce}`}</TimelineContent>
-            </TimelineItem>
-            <TimelineItem>
-              <TimelineSeparator>
-                <TimelineDot />
-                <TimelineConnector />
-              </TimelineSeparator>
-              <TimelineContent>{`Salt: ${userSalt}`}</TimelineContent>
-            </TimelineItem>
-            <TimelineItem>
-              <TimelineSeparator>
-                <TimelineDot />
-                <TimelineConnector />
-              </TimelineSeparator>
-              <TimelineContent>{`ID Token: ${idToken}`}</TimelineContent>
-            </TimelineItem>
-            <TimelineItem>
-              <TimelineSeparator>
-                <TimelineDot />
-                <TimelineConnector />
-              </TimelineSeparator>
-              <TimelineContent>
-                {`User SUI Address: ${zkLoginUserAddress}`}
-              </TimelineContent>
-            </TimelineItem>
-            <TimelineItem>
-              <TimelineSeparator>
-                <TimelineDot />
-              </TimelineSeparator>
-              <TimelineContent>
-                {`extendedEphemeralPublicKey ${extendedEphemeralPublicKey}`}
-              </TimelineContent>
-            </TimelineItem>
-          </Timeline>
-        </Paper>
+            Stinky Tofu Logs
+          </Typography>
+          <Paper
+            elevation={1}
+            sx={{
+              width: 500,
+              height: 700,
+              overflowY: "auto",
+            }}
+          >
+            <Timeline
+              sx={{
+                [`& .${timelineItemClasses.root}:before`]: {
+                  flex: 0,
+                  padding: 0,
+                },
+              }}
+            >
+              <TimelineItem>
+                <TimelineSeparator>
+                  <TimelineDot />
+                  <TimelineConnector />
+                </TimelineSeparator>
+                <TimelineContent>
+                  <div style={{ overflowWrap: "anywhere" }}>
+                    {`Private Key ${JSON.stringify(
+                      ephemeralKeyPair?.export()
+                    )}`}
+                  </div>
+                </TimelineContent>
+              </TimelineItem>
+              <TimelineItem>
+                <TimelineSeparator>
+                  <TimelineDot />
+                  <TimelineConnector />
+                </TimelineSeparator>
+                <TimelineContent>
+                  <div style={{ overflowWrap: "anywhere" }}>
+                    {`Public Key: ${JSON.stringify(
+                      ephemeralKeyPair?.getPublicKey().toBase64()
+                    )}`}
+                  </div>
+                </TimelineContent>
+              </TimelineItem>
+              <TimelineItem>
+                <TimelineSeparator>
+                  <TimelineDot />
+                  <TimelineConnector />
+                </TimelineSeparator>
+                <TimelineContent>
+                  <div
+                    style={{ overflowWrap: "anywhere" }}
+                  >{`Current Epoch: ${currentEpoch}`}</div>
+                </TimelineContent>
+              </TimelineItem>
+              <TimelineItem>
+                <TimelineSeparator>
+                  <TimelineDot />
+                  <TimelineConnector />
+                </TimelineSeparator>
+                <TimelineContent>
+                  <div
+                    style={{ overflowWrap: "anywhere" }}
+                  >{`Randomness: ${randomness}`}</div>
+                </TimelineContent>
+              </TimelineItem>
+              <TimelineItem>
+                <TimelineSeparator>
+                  <TimelineDot />
+                  <TimelineConnector />
+                </TimelineSeparator>
+                <TimelineContent>
+                  <div
+                    style={{ overflowWrap: "anywhere" }}
+                  >{`Nonce: ${nonce}`}</div>
+                </TimelineContent>
+              </TimelineItem>
+              <TimelineItem>
+                <TimelineSeparator>
+                  <TimelineDot />
+                  <TimelineConnector />
+                </TimelineSeparator>
+                <TimelineContent>
+                  <div
+                    style={{ overflowWrap: "anywhere" }}
+                  >{`Salt: ${userSalt}`}</div>
+                </TimelineContent>
+              </TimelineItem>
+              <TimelineItem>
+                <TimelineSeparator>
+                  <TimelineDot />
+                  <TimelineConnector />
+                </TimelineSeparator>
+                <TimelineContent>
+                  <div
+                    style={{ overflowWrap: "anywhere" }}
+                  >{`ID Token: ${idToken}`}</div>
+                </TimelineContent>
+              </TimelineItem>
+              <TimelineItem>
+                <TimelineSeparator>
+                  <TimelineDot />
+                  <TimelineConnector />
+                </TimelineSeparator>
+                <TimelineContent>
+                  <div
+                    style={{ overflowWrap: "anywhere" }}
+                  >{`User SUI Address: ${zkLoginUserAddress}`}</div>
+                </TimelineContent>
+              </TimelineItem>
+              <TimelineItem>
+                <TimelineSeparator>
+                  <TimelineDot />
+                </TimelineSeparator>
+                <TimelineContent>
+                  <div
+                    style={{ overflowWrap: "anywhere" }}
+                  >{`extendedEphemeralPublicKey ${extendedEphemeralPublicKey}`}</div>
+                </TimelineContent>
+              </TimelineItem>
+            </Timeline>
+          </Paper>
+        </Box>
       </Stack>
     </Box>
   );

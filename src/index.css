@@ -27,7 +27,7 @@ a:hover {
 }
 
 code {
-  background: papayawhip;
+  background: rgb(253 224 71 / var(--tw-border-opacity));
   padding: 4px 8px;
   border-radius: 4px;
 }
@@ -42,4 +42,8 @@ body {
 h1 {
   font-size: 3.2em;
   line-height: 1.1;
+}
+
+.MuiAlert-outlined {
+  border: none !important;
 }
