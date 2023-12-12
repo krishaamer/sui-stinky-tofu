@@ -466,7 +466,7 @@ function App() {
               }}
             >
               <Typography sx={{ fontSize: "1.5em", color: "#ffffff" }}>
-                1. Start Cooking Tofu 🇹🇼🍢
+                1. Start Cooking Tofu 🇹🇼
               </Typography>
             </Button>
             <Button
@@ -485,17 +485,17 @@ function App() {
                 window.location.replace(loginURL);
               }}
             >
+              <Typography sx={{ fontSize: "1.5em", color: "#ffffff" }}>
+                2. Sign In With Kakao
+              </Typography>
               <img
                 src={KakaoLogo}
                 width="100px"
                 style={{
-                  marginRight: "8px",
+                  marginLeft: "8px",
                 }}
                 alt="Kakao"
-              />{" "}
-              <Typography sx={{ fontSize: "1.5em", color: "#ffffff" }}>
-                2. Sign In With Kakao
-              </Typography>
+              />
             </Button>
             <LoadingButton
               size="large"
@@ -505,7 +505,7 @@ function App() {
               onClick={requestFaucet}
             >
               <Typography sx={{ fontSize: "1.5em", color: "#ffffff" }}>
-                3. Add Taiwanese SUI 加油+
+                3. Get Taiwanese SUI 加油+
               </Typography>
             </LoadingButton>
             <Button
@@ -770,7 +770,7 @@ function App() {
                   });
 
                   enqueueSnackbar(
-                    `Execution successful: ${executeRes.digest}`,
+                    `Stinky Tofu Saved: ${executeRes.digest}`,
                     {
                       variant: "success",
                     }
@@ -789,7 +789,7 @@ function App() {
               <Typography
                 sx={{ fontSize: "1.8em", color: "#ffffff", fontWeight: 500 }}
               >
-                Buy This Stinky Tofu
+                Buy Stinky Tofu
               </Typography>
             </LoadingButton>
             <Typography
