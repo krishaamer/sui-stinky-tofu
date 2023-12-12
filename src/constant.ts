@@ -2,7 +2,7 @@ export const FULLNODE_URL = "https://fullnode.devnet.sui.io";
 
 export const REST_API_KEY = "c8a3a949861fa51b75e63a9fc2ad485d";
 
-export const REDIRECT_URI = import.meta.env.REDIRECT_URI;
+export const REDIRECT_URI = import.meta.env.VITE_REDIRECT_URI;
 
 export const SUI_DEVNET_FAUCET = "https://faucet.devnet.sui.io/gas";
 
