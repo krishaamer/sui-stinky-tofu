@@ -14,5 +14,6 @@ I present a design fiction about a possible future where the Taiwanese governmen
 - TailwindCSS
 - MUI
 - Kakao APIs
-- Midjourney
+- Much help from GitHub Co-Pilot / OpenAI GPT 4
+- Images generated with Midjourney
 - ...
