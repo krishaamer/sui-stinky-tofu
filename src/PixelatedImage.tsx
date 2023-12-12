@@ -1,3 +1,5 @@
+/* eslint-disable react-hooks/exhaustive-deps */
+/* eslint-disable @typescript-eslint/ban-ts-comment */
 import { useRef, useEffect, useState, FC } from "react";
 import p5 from "p5";
 
@@ -52,15 +54,18 @@ const PixelatedImage: FC<PixelatedImageProps> = ({ src, loadingTime }) => {
     if (sketchRef.current) {
       const p5Instance = new p5(sketch, sketchRef.current);
 
+      // @ts-ignore
       interval = setInterval(() => {
         pixelSize = Math.max(1, pixelSize - 1);
         if (pixelSize === 1) {
+          // @ts-ignore
           clearInterval(interval);
           setLoading(false); // Set loading to false when pixelation is done
         }
       }, loadingTime / 20);
 
       return () => {
+        // @ts-ignore
         clearInterval(interval);
         p5Instance.remove();
       };
