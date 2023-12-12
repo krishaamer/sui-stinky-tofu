@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/ban-ts-comment */
 import { LoadingButton } from "@mui/lab";
 import {
   Alert,
@@ -184,6 +185,7 @@ function App() {
     const fetchNonce = async () => {
       try {
         const nonce = await generateNonce(
+          // @ts-ignore
           ephemeralKeyPair.getPublicKey(),
           maxEpoch,
           randomness
@@ -216,6 +218,7 @@ function App() {
   useEffect(() => {
     const fetchUserAddress = async () => {
       try {
+        // @ts-ignore
         const zkLoginUserAddress = await jwtToAddress(jwtString, userSalt);
         setZkLoginUserAddress(zkLoginUserAddress);
       } catch (error) {
@@ -252,7 +255,7 @@ function App() {
           enqueueSnackbar("Successfully obtain ZK Proof", {
             variant: "success",
           });
-        } catch (error: any) {
+        } catch (error) {
           console.error(error);
           enqueueSnackbar(String(error?.response?.data?.message || error), {
             variant: "error",
@@ -279,6 +282,7 @@ function App() {
     const fetchExtendedEphemeralPublicKey = async () => {
       try {
         const extendedEphemeralPublicKey = await getExtendedEphemeralPublicKey(
+          // @ts-ignore
           ephemeralKeyPair.getPublicKey()
         );
 
@@ -340,6 +344,7 @@ function App() {
     }
   };
 
+  // @ts-ignore
   const exchangeCodeForToken = async (code) => {
     try {
       const response = await axios.post(
@@ -514,21 +519,6 @@ function App() {
             </Button>
           </Stack>
         </Stack>
-        <Box>
-          {executeDigest && (
-            <Alert severity="success" sx={{ mt: "12px" }}>
-              Stinky Tofu Saved!{" "}
-              <Typography component="span">
-                <a
-                  href={`https://suiexplorer.com/txblock/${executeDigest}?network=devnet`}
-                  target="_blank"
-                >
-                  {executeDigest}
-                </a>
-              </Typography>
-            </Alert>
-          )}
-        </Box>
       </Box>
       <Stack
         direction="row"
@@ -818,7 +808,7 @@ function App() {
         <Box>
           {executeDigest && (
             <Alert severity="success" sx={{ mt: "12px" }}>
-              Execution successful:{" "}
+              Stinky Tofu Saved!{" "}
               <Typography component="span">
                 <a
                   href={`https://suiexplorer.com/txblock/${executeDigest}?network=devnet`}
