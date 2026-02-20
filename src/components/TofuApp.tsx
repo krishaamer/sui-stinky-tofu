@@ -33,7 +33,7 @@ import { fromBase64 as fromB64 } from "@mysten/sui/utils";
 import { useSuiClientQuery } from "@mysten/dapp-kit";
 import { SuiJsonRpcClient as SuiClient } from "@mysten/sui/jsonRpc";
 // @ts-ignore
-import { type SerializedSignature } from "@mysten/sui/cryptography";
+import { type SerializedSignature, decodeSuiPrivateKey } from "@mysten/sui/cryptography";
 import { Ed25519Keypair } from "@mysten/sui/keypairs/ed25519";
 import { Transaction } from "@mysten/sui/transactions";
 import { MIST_PER_SUI } from "@mysten/sui/utils";
@@ -167,10 +167,13 @@ function App() {
       KEY_PAIR_SESSION_STORAGE_KEY
     );
     if (privateKey) {
-      const ephemeralKeyPair = Ed25519Keypair.fromSecretKey(
-        fromB64(privateKey)
-      );
-      setEphemeralKeyPair(ephemeralKeyPair);
+      try {
+        const { secretKey } = decodeSuiPrivateKey(privateKey);
+        const ephemeralKeyPair = Ed25519Keypair.fromSecretKey(secretKey);
+        setEphemeralKeyPair(ephemeralKeyPair);
+      } catch (e) {
+        console.error("Failed to restore ephemeral keypair", e);
+      }
     }
     const randomness = window.sessionStorage.getItem(
       RANDOMNESS_SESSION_STORAGE_KEY

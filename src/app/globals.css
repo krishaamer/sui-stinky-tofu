@@ -47,7 +47,7 @@ h1 {
 .MuiAlert-outlined {
   border: none !important;
   padding: 2px !important;
-}#root {
+}.app-container {
   margin: 0 auto;
   padding: 2rem;
   text-align: left;
