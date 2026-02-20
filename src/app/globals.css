@@ -47,4 +47,11 @@ h1 {
 .MuiAlert-outlined {
   border: none !important;
   padding: 2px !important;
+}#root {
+  margin: 0 auto;
+  padding: 2rem;
+  text-align: left;
+  font-family: "Sniglet", sans-serif;
+  width: 100vw;
+  max-width: 1440px
 }

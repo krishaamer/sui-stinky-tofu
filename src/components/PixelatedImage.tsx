@@ -1,3 +1,5 @@
+"use client";
+
 /* eslint-disable react-hooks/exhaustive-deps */
 /* eslint-disable @typescript-eslint/ban-ts-comment */
 import { useRef, useEffect, useState, FC } from "react";
@@ -14,26 +16,32 @@ const PixelatedImage: FC<PixelatedImageProps> = ({ src, loadingTime }) => {
   const [loading, setLoading] = useState<boolean>(true); // Specify type for state variable
   let img: p5.Image;
   let pixelSize: number = 20;
-  let interval: NodeJS.Timer;
+  let interval: ReturnType<typeof setInterval>;
 
   const sketch = (p: p5) => {
-    p.preload = () => {
-      img = p.loadImage(src, () => setLoading(false));
-    };
-
-    p.setup = () => {
+    p.setup = async () => {
       const canvas = p.createCanvas(400, 400);
       canvas.style("width", "400px");
       canvas.style("height", "400px");
       canvas.style("border-radius", "10px");
-      img.resize(400, 400);
+      
+      try {
+        img = await p.loadImage(src);
+        img.resize(400, 400);
+        setLoading(false);
+      } catch (e) {
+        console.error("Failed to load image", e);
+      }
     };
 
     p.draw = () => {
+      if (!img) return; // Wait until image is loaded
+
       if (loading) {
+        img.loadPixels();
         for (let y = 0; y < p.height; y += pixelSize) {
           for (let x = 0; x < p.width; x += pixelSize) {
-            const i = (y * p.width + x) * 4;
+            const i = (Math.floor(y) * p.width + Math.floor(x)) * 4;
             const r = img.pixels[i];
             const g = img.pixels[i + 1];
             const b = img.pixels[i + 2];
@@ -42,7 +50,6 @@ const PixelatedImage: FC<PixelatedImageProps> = ({ src, loadingTime }) => {
             p.rect(x, y, pixelSize, pixelSize);
           }
         }
-        img.loadPixels();
       } else {
         // Draw original image once loading is complete
         p.image(img, 0, 0, 400, 400);

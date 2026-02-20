@@ -1,3 +1,5 @@
+"use client";
+
 /* eslint-disable @typescript-eslint/ban-ts-comment */
 import { LoadingButton } from "@mui/lab";
 import {
@@ -23,13 +25,14 @@ import {
   timelineItemClasses,
 } from "@mui/lab";
 
-import { fromB64 } from "@mysten/bcs";
+import { fromBase64 as fromB64 } from "@mysten/sui/utils";
 import { useSuiClientQuery } from "@mysten/dapp-kit";
-import { SuiClient } from "@mysten/sui.js/client";
-import { SerializedSignature } from "@mysten/sui.js/cryptography";
-import { Ed25519Keypair } from "@mysten/sui.js/keypairs/ed25519";
-import { TransactionBlock } from "@mysten/sui.js/transactions";
-import { MIST_PER_SUI } from "@mysten/sui.js/utils";
+import { SuiJsonRpcClient as SuiClient } from "@mysten/sui/jsonRpc";
+// @ts-ignore
+import { type SerializedSignature } from "@mysten/sui/cryptography";
+import { Ed25519Keypair } from "@mysten/sui/keypairs/ed25519";
+import { Transaction } from "@mysten/sui/transactions";
+import { MIST_PER_SUI } from "@mysten/sui/utils";
 import {
   genAddressSeed,
   generateNonce,
@@ -37,16 +40,14 @@ import {
   getExtendedEphemeralPublicKey,
   getZkLoginSignature,
   jwtToAddress,
-} from "@mysten/zklogin";
+} from "@mysten/sui/zklogin";
 import axios from "axios";
 import { BigNumber } from "bignumber.js";
 import { JwtPayload, jwtDecode } from "jwt-decode";
 import { enqueueSnackbar } from "notistack";
 import queryString from "query-string";
 import { useEffect, useState } from "react";
-import { useLocation, useNavigate } from "react-router-dom";
-import "./App.css";
-import KakaoLogo from "./assets/kakao.png";
+import { useRouter, useSearchParams } from "next/navigation";
 import {
   REST_API_KEY,
   FULLNODE_URL,
@@ -57,14 +58,17 @@ import {
   SUI_DEVNET_FAUCET,
   SUI_PROVER_DEV_ENDPOINT,
   USER_SALT_LOCAL_STORAGE_KEY,
-} from "./constant";
+  RECIPIENT_ADDRESS,
+} from "../lib/constant";
+
+const KakaoLogo = "/assets/kakao.png";
 
 export type PartialZkLoginSignature = Omit<
   Parameters<typeof getZkLoginSignature>["0"]["inputs"],
   "addressSeed"
 >;
 
-const suiClient = new SuiClient({ url: FULLNODE_URL });
+const suiClient = new SuiClient({ url: FULLNODE_URL, network: "devnet" });
 
 function App() {
   const [tofuImage, setTofuImage] = useState("");
@@ -87,13 +91,14 @@ function App() {
   const [executingTxn, setExecutingTxn] = useState(false);
   const [executeDigest, setExecuteDigest] = useState("");
 
-  const location = useLocation();
-  const navigate = useNavigate();
+  const router = useRouter();
+  const searchParams = useSearchParams();
 
   useEffect(() => {
-    const res = queryString.parse(location.hash);
+    const hash = window.location.hash.substring(1);
+    const res = queryString.parse(hash);
     setOauthParams(res);
-  }, [location]);
+  }, [searchParams]);
 
   // query jwt id_token
   useEffect(() => {
@@ -106,11 +111,11 @@ function App() {
 
   useEffect(() => {
     // Check for the presence of the authorization code
-    const queryParams = queryString.parse(location.search);
-    if (queryParams.code) {
-      exchangeCodeForToken(queryParams.code);
+    const code = searchParams.get("code");
+    if (code) {
+      exchangeCodeForToken(code);
     }
-  }, [location]);
+  }, [searchParams]);
 
   useEffect(() => {
     const fetchEpochData = async () => {
@@ -184,6 +189,7 @@ function App() {
   useEffect(() => {
     const fetchNonce = async () => {
       try {
+        if (!ephemeralKeyPair) return;
         const nonce = await generateNonce(
           // @ts-ignore
           ephemeralKeyPair.getPublicKey(),
@@ -218,6 +224,7 @@ function App() {
   useEffect(() => {
     const fetchUserAddress = async () => {
       try {
+        if (!jwtString || !userSalt) return;
         // @ts-ignore
         const zkLoginUserAddress = await jwtToAddress(jwtString, userSalt);
         setZkLoginUserAddress(zkLoginUserAddress);
@@ -231,7 +238,7 @@ function App() {
   }, [jwtString, userSalt]);
 
   useEffect(() => {
-    if (userSalt && jwtString) {
+    if (userSalt && jwtString && idToken && extendedEphemeralPublicKey) {
       const fetchZKProof = async () => {
         try {
           //setFetchingZKProof(true);
@@ -334,7 +341,7 @@ function App() {
       window.sessionStorage.clear();
       window.localStorage.clear();
       resetState();
-      navigate(`/`);
+      router.push(`/`);
       enqueueSnackbar("Reset successful", {
         variant: "success",
       });
@@ -401,7 +408,7 @@ function App() {
     const ephemeralKeyPair = Ed25519Keypair.generate();
     window.sessionStorage.setItem(
       KEY_PAIR_SESSION_STORAGE_KEY,
-      ephemeralKeyPair.export().privateKey
+      ephemeralKeyPair.getSecretKey()
     );
     setEphemeralKeyPair(ephemeralKeyPair);
 
@@ -585,7 +592,7 @@ function App() {
                 <TimelineContent>
                   <div style={{ overflowWrap: "anywhere" }}>
                     {`Private Key ${JSON.stringify(
-                      ephemeralKeyPair?.export()
+                      ephemeralKeyPair?.getSecretKey()
                     )}`}
                   </div>
                 </TimelineContent>
@@ -732,12 +739,12 @@ function App() {
                     return;
                   }
                   setExecutingTxn(true);
-                  const txb = new TransactionBlock();
+                  const txb = new Transaction();
 
                   const [coin] = txb.splitCoins(txb.gas, [MIST_PER_SUI * 1n]);
                   txb.transferObjects(
                     [coin],
-                    "0xc2e1c711e827f27dea0a065b2767eb64296c95dffa152efbd834a3b6306a33f8"
+                    RECIPIENT_ADDRESS
                   );
 
                   //const imageUrl = `https://sui-stinky-tofu.vercel.app/tofus/tofu${tofuImage}.png`;
