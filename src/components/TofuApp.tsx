@@ -13,7 +13,11 @@ import {
   Skeleton,
 } from "@mui/material";
 import { deepOrange } from "@mui/material/colors";
-import PixelatedImage from "./PixelatedImage";
+import dynamic from "next/dynamic";
+
+const PixelatedImage = dynamic(() => import("./PixelatedImage"), {
+  ssr: false,
+});
 
 import {
   Timeline,
@@ -289,6 +293,7 @@ function App() {
   useEffect(() => {
     const fetchExtendedEphemeralPublicKey = async () => {
       try {
+        if (!ephemeralKeyPair) return;
         const extendedEphemeralPublicKey = await getExtendedEphemeralPublicKey(
           // @ts-ignore
           ephemeralKeyPair.getPublicKey()

@@ -1,6 +1,6 @@
 "use client";
 
-import { ThemeProvider } from "@emotion/react";
+import { ThemeProvider } from "@mui/material/styles";
 import { createTheme } from "@mui/material";
 import { SuiClientProvider, createNetworkConfig } from "@mysten/dapp-kit";
 import { getJsonRpcFullnodeUrl } from "@mysten/sui/jsonRpc";
