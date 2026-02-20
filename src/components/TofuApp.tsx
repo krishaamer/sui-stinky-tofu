@@ -1,7 +1,6 @@
 "use client";
 
 /* eslint-disable @typescript-eslint/ban-ts-comment */
-import { LoadingButton } from "@mui/lab";
 import {
   Alert,
   Box,
@@ -233,7 +232,7 @@ function App() {
       try {
         if (!jwtString || !userSalt) return;
         // @ts-ignore
-        const zkLoginUserAddress = await jwtToAddress(jwtString, userSalt);
+        const zkLoginUserAddress = await jwtToAddress(jwtString, userSalt, false);
         setZkLoginUserAddress(zkLoginUserAddress);
       } catch (error) {
         console.error("Error fetching address data:", error);
@@ -514,17 +513,18 @@ function App() {
                 alt="Kakao"
               />
             </Button>
-            <LoadingButton
+            <Button
               size="large"
               variant="contained"
+              // @ts-ignore
               loading={requestingFaucet}
-              disabled={!zkLoginUserAddress}
+              disabled={!zkLoginUserAddress || requestingFaucet}
               onClick={requestFaucet}
             >
               <Typography sx={{ fontSize: "1.5em", color: "#ffffff" }}>
                 3. Get Taiwanese Money 💰
               </Typography>
-            </LoadingButton>
+            </Button>
             <Button
               variant="outlined"
               color="error"
@@ -731,11 +731,12 @@ function App() {
         )}
         <Stack spacing={2}>
           <Stack direction="row" spacing={2}>
-            <LoadingButton
+            <Button
               size="large"
+              // @ts-ignore
               loading={executingTxn}
               variant="contained"
-              disabled={!decodedJwt}
+              disabled={!decodedJwt || executingTxn}
               onClick={async () => {
                 try {
                   if (
@@ -755,9 +756,9 @@ function App() {
                     RECIPIENT_ADDRESS
                   );
 
-                  //const imageUrl = `https://sui-stinky-tofu.vercel.app/tofus/tofu${tofuImage}.png`;
-                  //txb.addMetadata({ imageUrl });
-                  txb.setSender(zkLoginUserAddress);
+                  // Ensure we have the address for the sender
+                  const sender = zkLoginUserAddress || await jwtToAddress(jwtString, userSalt, false);
+                  txb.setSender(sender);
 
                   const { bytes, signature: userSignature } = await txb.sign({
                     client: suiClient,
@@ -808,7 +809,7 @@ function App() {
               >
                 Buy This Stinky Tofu
               </Typography>
-            </LoadingButton>
+            </Button>
             <Typography
               sx={{
                 fontSize: "1.5em",
